@@ -1,0 +1,41 @@
+\documentclass[titlepage]{article}
+
+
+% recognize standalone documentclass of all subfiles
+\usepackage{standalone}
+
+% import subfiles with correct paths
+\usepackage{import}
+
+% import all personal packages
+\input{mypackages.tex}
+
+
+\begin{document}
+
+\subimport{./title/}{title.tex}
+
+\subimport{./abstract/}{abstract.tex}   % section
+
+\subimport{./introduction/}{introduction.tex}   % section
+
+\begin{figure}
+    \includegraphics[width=\linewidth]{./dataset/mean.eps}
+    \caption{\protect\input{dataset/dataset.tex}}
+\end{figure}
+
+\begin{figure}
+    \includegraphics[width=\linewidth]{record/means.eps}
+    \caption{\protect\input{record/caption.tex}}
+\end{figure}
+
+\begin{figure}
+    \includegraphics[width=\linewidth]{histogram/bars.eps}
+    \caption{\protect\input{histogram/caption.tex}}
+\end{figure}
+
+\subimport{./data/}{data.tex}   % section
+
+\subimport{./conclusions/}{conclusions.tex}   % section
+
+\end{document}
