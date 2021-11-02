@@ -1,15 +1,14 @@
 \documentclass[titlepage]{article}
 
-
 % recognize standalone documentclass of all subfiles
 \usepackage{standalone}
 
-% import subfiles with correct paths
-\usepackage{import}
+%% imports
+\usepackage{etoolbox}   % conditionals needed for checking counters
+\usepackage{import}   % subfiles with correct paths
 
-% import all personal packages
-\input{mypackages.tex}
-
+%% preamble file
+\import{C:/Users/Bjorn/Documents/Projekt_Steinkauz/project/no_dc_removal}{mypackages}   % user-specified preamble
 
 \begin{document}
 

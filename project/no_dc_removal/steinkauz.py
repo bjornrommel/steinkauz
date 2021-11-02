@@ -66,8 +66,8 @@ DPI and MAG specify the DPI and magnification of the PNG output, where higher
 DPI and smaller MAG provide better resolution at higher expense in time and
 disk space
 
-28 Oct 2021
-version 2.0.0
+2 Nov 2021
+version 2.0.1
 @author: Björn E. Rommel
 """
 
@@ -596,15 +596,14 @@ class Steinkauz(Magics):
         template = TEMPLATE
         # set fully-qualified filename if prefile exisits
         if self.prefile:
-            self.prefile = (
-                self.fullname(
-                    folder=self.predir,
-                    file=self.prefile,# + '''.tex''',
-                    tex=True))
+            impstring = r'''\import'''
+            predir = self.fulldir(folder=self.predir, tex=True)
+            dirstring = r'''{''' + predir + r'''}'''
+            filestring = r'''{''' + self.prefile + r'''}'''
             template = (
                 template.replace(
                     r'''%%\input{PREFILE}''',
-                    r'''\input{''' + self.prefile + r'''}'''))
+                    impstring + dirstring + filestring))
         if self.mainfile:
             self.mainfile = (
                 self.fullname(
@@ -1324,7 +1323,10 @@ class Steinkauz(Magics):
         # check folder: absolute or relative
         if not os.path.isabs(folder):
             # make folder absolute
-            folder = os.path.join(FOLDER, folder)
+            if folder == r'.':                          # if not subfolder
+                folder = FOLDER                         # then just FOLDER
+            else:                                       # if subfolder
+                folder = os.path.join(FOLDER, folder)   # then create full path
         # make folder
         if not os.path.isdir(folder):
             try:
