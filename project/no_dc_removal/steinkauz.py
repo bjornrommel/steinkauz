@@ -598,7 +598,7 @@ class Steinkauz(Magics):
         if self.prefile:
             impstring = r'''\import'''
             predir = self.fulldir(folder=self.predir, tex=True)
-            dirstring = r'''{''' + predir + r'''}'''
+            dirstring = r'''{''' + predir + r'''/}'''
             filestring = r'''{''' + self.prefile + r'''}'''
             template = (
                 template.replace(
