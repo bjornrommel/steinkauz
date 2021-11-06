@@ -13,9 +13,9 @@ If you intend, firstly, to display your notebook on mybinder and, secondly, use 
 
 - remove the counter "chapter" from the list LATEXCOUNTER.
 
-Reason being, mybinder.org, which uses aN apparently old TeX-Live distribution, comes with a bug in the "standalone" class package. The command \begin{document} also defines \thechapter, but not the associated counter chapter. So, \ifdef{\thechapter}{\setcounter{chapter}{<value>}}{} bangs.
+Reason being, mybinder.org, which uses an apparently old TeX-Live distribution, comes with a bug in the "standalone" class package. The command \begin{document} also defines \thechapter, but not the associated counter chapter. So, \ifdef{\thechapter}{\setcounter{chapter}{<value>}}{} bangs.
 
-For that reason, steinkauz.py used in any of the notebooks presented on this repository does not include that counter. Only the version here, in the folder "download", does.
+For that reason, steinkauz.py, as used in any of the notebooks presented on this repository, does not include that counter. Only the version here, in the folder "download", does.
 
 ## Modification
 
