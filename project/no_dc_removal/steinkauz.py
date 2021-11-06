@@ -77,6 +77,7 @@ version 2.1.0
 
 # imports
 import os
+import sys
 import shutil
 from copy import deepcopy as cp
 from subprocess import run
@@ -175,6 +176,7 @@ TEMPLATE = r"""
 TEMPLATE = TEMPLATE.replace('    ', '')   # remove formatting
 TEMPLATE = TEMPLATE[1:-1]                 # remove EOL's
 
+# template file
 TEMPLATEFILE = os.path.join(FOLDER, STEINKAUZDIR, 'template.tex')
 
 
@@ -191,9 +193,9 @@ MAINFOLDER = ['.']
 SUBDELETE = ['aux', 'pdf', 'tex']
 SUBDELETE += MAINDELETE
 # delete additional files anywhere
-FILEDELETE = [
-    'INCOUNTER', 'OUTCOUNTER', 'DATAMEAN',
-    'RECORDSAMPLE', 'RECORDSTDRECORD', 'RECORDSTDTHEORY']
+FILEDELETE = ['INCOUNTER', 'OUTCOUNTER']
+FILEDELETE += [
+    'DATAMEAN', 'RECORDSAMPLE', 'RECORDSTDRECORD', 'RECORDSTDTHEORY']
 
 
 # --- change at your risk --- change at your risk --- change at your risk ---
@@ -276,8 +278,12 @@ EPSCMD = ['epstool', '--copy', '--bbox']
 # !! Note, epstool calls gswin32c; on Windows at least, copy gswin64c and
 # rename it gswin32c !!
 
-# suppress traceback (no need for user to see all that!)
-### sys.tracebacklimit = 0    # default
+
+# debug
+DEBUG = False
+if not DEBUG:
+    # suppress traceback (no need for user to see all that!)
+    sys.tracebacklimit = 0    # default
 
 
 # --- do not change below --- do not change below --- do not change below ---
@@ -705,11 +711,13 @@ class Steinkauz(Magics):
             except FileNotFoundError as msg:
                 string = "!!! cleanfile: file {} not found !!!\n".format(file)
                 print(string)
-                raise UserWarning(msg) from msg
+                if DEBUG:
+                    raise UserWarning(msg) from msg
             except PermissionError as msg:
                 string = "!!! cleanfile: file {} in use !!!\n".format(file)
                 print(string)
-                raise UserWarning(msg) from msg
+                if DEBUG:
+                    raise UserWarning(msg) from msg
 
         def cleanplusfile(file, delete=None):
             # clean if postfix in list
@@ -729,12 +737,14 @@ class Steinkauz(Magics):
                 string = "!!! cleanfolder: folder {folder:} in use !!!\n"
                 string = string.format(folder=folder)
                 print(string)
-                raise UserWarning(msg) from msg
+                if DEBUG:
+                    raise UserWarning(msg) from msg
             except (OSError, FileNotFoundError) as msg:
                 string = "!!! cleanfolder: folder {folder:} not found !!!\n"
                 string = string.format(folder=folder)
                 print(string)
-                raise UserWarning(msg) from msg
+                if DEBUG:
+                    raise UserWarning(msg) from msg
 
         # delete all files in notebook tree
         for root, _, files in os.walk('.'):
