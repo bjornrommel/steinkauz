@@ -66,8 +66,8 @@ DPI and MAG specify the DPI and magnification of the PNG output, where higher
 DPI and smaller MAG provide better resolution at higher expense in time and
 disk space
 
-28 Oct 2021
-version 2.0.0
+6 Nov 2021
+version 2.1.0
 @author: Björn E. Rommel
 """
 
@@ -181,27 +181,32 @@ TEMPLATEFILE = os.path.join(FOLDER, STEINKAUZDIR, 'template.tex')
 # delete folders including all files, if any, inside those folders
 FOLDERDELETE = [r'.\.ipynb_checkpoints', r'.\__pycache__', r'.\.steinkauz']
 # delete additional non-steinkauz and non-jupyter directories
-FOLDERDELETE += [
-    r'.\cell', r'.\example', r'.\introhead', r'.\introtext', r'.\line',
-    r'.\reference', r'.\repo']
+FOLDERDELETE += []
 # delete all files with postfixes as in MAINDELETE from folders MAINFOLDER
 MAINDELETE = [
-    'dvi', 'epi', 'log', 'png', 'png64', 'ps', 'pyc', 'synctex',
+    'dvi', 'epi', 'eps', 'log', 'png', 'png64', 'ps', 'pyc', 'synctex',
     'synctex(busy)']
 MAINFOLDER = ['.']
 # delete all files with postfixes as in SUBDELETE in all sub directories
-SUBDELETE = ['aux', 'pdf']
+SUBDELETE = ['aux', 'pdf', 'tex']
 SUBDELETE += MAINDELETE
 # delete additional files anywhere
-FILEDELETE = ['MEAN', 'INCOUNTER', 'OUTCOUNTER']
+FILEDELETE = [
+    'INCOUNTER', 'OUTCOUNTER', 'DATAMEAN',
+    'RECORDSAMPLE', 'RECORDSTDRECORD', 'RECORDSTDTHEORY']
 
 
 # --- change at your risk --- change at your risk --- change at your risk ---
 
 
-# define LaTeX counters
+# define LaTeX counters for general use
+### LATEXCOUNTER = [
+###    'part', 'chapter', 'section', 'subsection', 'subsubsection', 'paragraph',
+###    'subparagraph','page','equation','figure', 'table', 'footnote',
+###    'mpfootnote', 'enumi', 'enumii', 'enumiii', 'enumiv']
+# define LaTeX counters for documentclass article on mybinder.org
 LATEXCOUNTER = [
-    'part', 'chapter', 'section', 'subsection', 'subsubsection', 'paragraph',
+    'part', 'section', 'subsection', 'subsubsection', 'paragraph',
     'subparagraph','page','equation','figure', 'table', 'footnote',
     'mpfootnote', 'enumi', 'enumii', 'enumiii', 'enumiv']
 
@@ -596,15 +601,14 @@ class Steinkauz(Magics):
         template = TEMPLATE
         # set fully-qualified filename if prefile exisits
         if self.prefile:
-            self.prefile = (
-                self.fullname(
-                    folder=self.predir,
-                    file=self.prefile,# + '''.tex''',
-                    tex=True))
+            impstring = r'''\import'''
+            predir = self.fulldir(folder=self.predir, tex=True)
+            dirstring = r'''{''' + predir + r'''/}'''
+            filestring = r'''{''' + self.prefile + r'''}'''
             template = (
                 template.replace(
                     r'''%%\input{PREFILE}''',
-                    r'''\input{''' + self.prefile + r'''}'''))
+                    impstring + dirstring + filestring))
         if self.mainfile:
             self.mainfile = (
                 self.fullname(
@@ -701,11 +705,11 @@ class Steinkauz(Magics):
             except FileNotFoundError as msg:
                 string = "!!! cleanfile: file {} not found !!!\n".format(file)
                 print(string)
-                ### raise UserWarning(msg) from msg
+                raise UserWarning(msg) from msg
             except PermissionError as msg:
                 string = "!!! cleanfile: file {} in use !!!\n".format(file)
                 print(string)
-                ### raise UserWarning(msg) from msg
+                raise UserWarning(msg) from msg
 
         def cleanplusfile(file, delete=None):
             # clean if postfix in list
@@ -725,12 +729,12 @@ class Steinkauz(Magics):
                 string = "!!! cleanfolder: folder {folder:} in use !!!\n"
                 string = string.format(folder=folder)
                 print(string)
-                ### raise UserWarning(msg) from msg
+                raise UserWarning(msg) from msg
             except (OSError, FileNotFoundError) as msg:
                 string = "!!! cleanfolder: folder {folder:} not found !!!\n"
                 string = string.format(folder=folder)
                 print(string)
-                ### raise UserWarning(msg) from msg
+                raise UserWarning(msg) from msg
 
         # delete all files in notebook tree
         for root, _, files in os.walk('.'):
@@ -1324,7 +1328,10 @@ class Steinkauz(Magics):
         # check folder: absolute or relative
         if not os.path.isabs(folder):
             # make folder absolute
-            folder = os.path.join(FOLDER, folder)
+            if folder == r'.':                          # if not subfolder
+                folder = FOLDER                         # then just FOLDER
+            else:                                       # if subfolder
+                folder = os.path.join(FOLDER, folder)   # then create full path
         # make folder
         if not os.path.isdir(folder):
             try:

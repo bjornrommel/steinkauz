@@ -66,8 +66,8 @@ DPI and MAG specify the DPI and magnification of the PNG output, where higher
 DPI and smaller MAG provide better resolution at higher expense in time and
 disk space
 
-2 Nov 2021
-version 2.0.1
+6 Nov 2021
+version 2.1.0
 @author: Björn E. Rommel
 """
 
@@ -199,9 +199,14 @@ FILEDELETE = [
 # --- change at your risk --- change at your risk --- change at your risk ---
 
 
-# define LaTeX counters
+# define LaTeX counters for general use
+### LATEXCOUNTER = [
+###    'part', 'chapter', 'section', 'subsection', 'subsubsection', 'paragraph',
+###    'subparagraph','page','equation','figure', 'table', 'footnote',
+###    'mpfootnote', 'enumi', 'enumii', 'enumiii', 'enumiv']
+# define LaTeX counters for documentclass article on mybinder.org
 LATEXCOUNTER = [
-    'part', 'chapter', 'section', 'subsection', 'subsubsection', 'paragraph',
+    'part', 'section', 'subsection', 'subsubsection', 'paragraph',
     'subparagraph','page','equation','figure', 'table', 'footnote',
     'mpfootnote', 'enumi', 'enumii', 'enumiii', 'enumiv']
 

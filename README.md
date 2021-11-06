@@ -15,7 +15,7 @@ The IPython extension steinkauz provides a line / cell magic rendering all LaTeX
 
 ## Module steinkauz  
 
-steinkauz.py is an iPython line/cell magics extension. It converts a LaTeX fragment, which it gets from a file or reads in from the notebook itself, into a PNG image. This PNG file will then be displayed inside the notebook. Key point being, that fragment can be updated in line with the results of computations made in that notebook. For details see the file documentation.
+steinkauz.py is an iPython line/cell magics extension. It converts a LaTeX fragment, which it gets from a file or reads in from the notebook itself, into a PNG image. This PNG file will then be displayed inside the notebook. Key point being, that fragment can be updated in line with the results of computations made in that notebook. For details see the tutorial, and download the source file, all in their respectively named directories.
 
 ## Collaboration and Support
  
