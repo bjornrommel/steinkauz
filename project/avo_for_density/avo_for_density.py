@@ -313,7 +313,7 @@ def get_data(snr=SNR):
     # check for None
     if not snr:
         string = 'signal-to-noise ratio {} not NAN or positive finite!'
-        raise AssertionError()   
+        raise AssertionError()
     # rule out NAN
     # (NAN for classical = non-Bayesian inversion)
     if not np.isnan(snr):
@@ -894,7 +894,7 @@ def get_input(   # pylint:disable=too-many-arguments
             properties of the prior contrast
         prior :
             properties of the prior (model)
-        para : 
+        para :
             user defined parameters
             'vsp': S-to-P velocity ratio
 
@@ -1085,7 +1085,7 @@ def get_medium(text='', halfspace=None, **kwargs):
                 if val >= np.sqrt(3. / 8.) * vp:   # stability criterion
                     string = text + prop + ' >= sqrt(3 / 8) * vp!'
                     raise AssertionError(string)   # bang
-            return True
+        return True
 
     def valid2(prop=None, val=np.NAN):
         """
@@ -1147,7 +1147,7 @@ def get_medium(text='', halfspace=None, **kwargs):
             if np.isfinite(val):
                 # return True if valid, False if not
                 return (
-                    np.all([valid(prop=prop, val=val) 
+                    np.all([valid(prop=prop, val=val)
                     for valid in validlist[prop]]))
         string = 'no valid property {} or value {}'.format(prop, val)
         raise AssertionError(string)   # bang
@@ -1175,7 +1175,7 @@ def get_back():
     Computes the background medium.
 
     Input are the elastic parameters of top and bottom halfspace.
-    
+
     Globals
     -------
     top : dict
@@ -1211,7 +1211,7 @@ def get_precon():
     Computes the prior contrast.
 
     Input are the elastic parameters of top and bottom halfspace.
-    
+
     Globals
     -------
     top : dict
@@ -1247,7 +1247,7 @@ def get_prior():
     Computes the prior.
 
     Input are background and prior contrast.
-    
+
     Globals:
         precon : dict
             Prior contrast.
@@ -1292,7 +1292,7 @@ def get_poscon():
     Computes the posterior contrast.
 
     Input are the background and posterior (from AVA inversion).
-    
+
     Globals
     -------
     back : dict
