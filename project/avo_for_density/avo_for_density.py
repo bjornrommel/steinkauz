@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Nov  8 07:52:18 2021
+Python code for the "avo_for_density" Notebook.
 
-@author: Bjorn
+@author: Björn E. Rommel, version: 1.0.0
 """
 
 
@@ -808,6 +808,7 @@ def invert_ava(mode=None):
     # print
     if DEBUG:
         printout(text='posterior model:', vals=post)
+        printout(text='posterior contrast:', vals=poscon)
 
 
 def comp_post_ava():

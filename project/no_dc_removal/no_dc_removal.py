@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Python code for the "No DC Removal" notebook.
+Python code for the "No DC Removal" Notebook.
 
-@author: Björn E. Rommel
+@author: Björn E. Rommel, version 2.1.0
 """
 
 
