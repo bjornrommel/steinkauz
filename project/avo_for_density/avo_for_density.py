@@ -12,7 +12,7 @@ import sys
 from copy import deepcopy as cp
 import numpy as np
 from numpy.random import default_rng as rnd
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
 
 
 # --- change --- change --- change --- change --- change --- change --- change
