@@ -19,7 +19,7 @@ The IPython extension steinkauz provides a line / cell magic rendering all LaTeX
 
 ## Patent
 
-- Time Drift Calibration:
+- [Time Drift Calibration:](https://github.com/bjornrommel/steinkauz/tree/master/project/time_drift_calibration)
 Calibrate a time drift of a node during its deployment (in-situ). 
 
 ## Module Steinkauz  
