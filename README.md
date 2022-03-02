@@ -3,6 +3,11 @@
 Projekt Steinkauz: a series of notebooks on various topics of seismic data processing.
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/bjornrommel/steinkauz/master)  
 
+## Python
+
+- Traveltime Ambiguity:
+Modifying the subsurface, and the velocity of a seismic wave travelling through the subsurface, in some specific way changes the traveltime of that wave very little. Here, a Python software simulates the propagation of two waves, the original and a modified one, and displays their wavefronts. Note, the software is still work-in-progress, and in specific situations the algorithm fails short of the physics.
+
 ## Notebooks
 
 - AVO for Density:
