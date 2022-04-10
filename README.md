@@ -8,6 +8,11 @@ Projekt Steinkauz: a series of notebooks on various topics of seismic data proce
 - [Traveltime Ambiguity](https://github.com/bjornrommel/steinkauz/tree/master/project/ambiguity):
 Modifying the subsurface, and the velocity of a seismic wave travelling through the subsurface, in some specific way changes the traveltime of that wave very little. Here, a Python software simulates the propagation of two waves, the original and a modified one, and displays their wavefronts. Note, the software is still work-in-progress, and in specific situations the algorithm fails short of the physics.
 
+## C++
+
+- [Positioning and Timing of Nodes] (https://github.com/bjornrommel/steinkauz/tree/master/project/position_time)
+Deploying nodes is not perfect: nodes are usually slightly mis-positioned. Using source location, all available first breaks and pinger time signals, however, the position of nodes can be determined.  
+
 ## Notebooks
 
 - AVO for Density:
@@ -29,7 +34,7 @@ Calibrate a time drift of a node during its deployment (in-situ).
 
 ## Module Steinkauz  
 
-- Download Steinkauz:
+- [Download Steinkauz:](https://github.com/bjornrommel/steinkauz/tree/master/project/download_steinkauz)
 steinkauz.py is an iPython line/cell magics extension. It converts a LaTeX fragment, which it gets from a file or reads in from the notebook itself, into a PNG image. This PNG file will then be displayed inside the notebook. Key point being, that fragment can be updated in line with the results of computations made in that notebook. For details see the tutorial, and download the source file, all in their respectively named directories.
 
 ## Collaboration and Support
