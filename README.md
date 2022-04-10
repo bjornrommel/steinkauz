@@ -10,7 +10,7 @@ Modifying the subsurface, and the velocity of a seismic wave travelling through 
 
 ## C++
 
-- [Positioning and Timing of Nodes] (https://github.com/bjornrommel/steinkauz/tree/master/project/position_time)
+- [Positioning and Timing of Nodes](https://github.com/bjornrommel/steinkauz/tree/master/project/position_time)
 Deploying nodes is not perfect: nodes are usually slightly mis-positioned. Using source location, all available first breaks and pinger time signals, however, the position of nodes can be determined.  
 
 ## Notebooks
