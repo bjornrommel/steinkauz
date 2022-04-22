@@ -10,24 +10,20 @@
 
 
 // define constructor for Perturbation
-Perturbation::Perturbation() :
-	normal()                     // initialize a normal distribution
-{
-
+Perturbation::Perturbation() {
 };
 
 
 // define function for Perturbation
-Eigen::VectorXd Perturbation::get_perturb(MomentType locmoment, int dim)
-{
+Eigen::VectorXd Perturbation::get_perturbation(MomentType moment, int dim, Normal normal) {
 
-	// generate perturbation vector of the same length as locmoment
-	Eigen::VectorXd perturb(dim);                                            // define perturbation vector
-	for (int i = 0; i < dim; ++i) {                                          // loop over vector dimension
-		perturb(i) = locmoment.mean[i] + locmoment.std[i] * normal.get_normal();   // modify mean, std
+	// generate perturbation of the same length as moment
+	Eigen::VectorXd perturbation(dim);                                            // define perturbation
+	for (int i = 0; i < dim; ++i) {                                               // loop over vector dimension
+		perturbation(i) = moment.mean[i] + moment.std[i] * normal.get_normal();   // modify mean, std
 	};
 
 	// return
-	return perturb;
+	return perturbation;
 
 };

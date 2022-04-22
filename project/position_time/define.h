@@ -10,103 +10,117 @@
 
 // include
 #include <Dense>
+#include <random>
 #include "config.h"
 
 
 // define names for devices
-const int NODEFLAG = 1;
-const int SOURCEFLAG = 2;
-const int PINGERFLAG = 3;
+const int NODE_FLAG{ 1 };
+const int SOURCE_FLAG{ 2 };
+const int PINGER_FLAG{ 3 };
 const std::vector<std::string> DEVICE = { "node:", "source:", "pinger:" };
 
+// define location globals
+const int STATE_DIM = 4;                           // number of states (as listed below)
+const int NOM = 0;                                 // nominal
+const int ACT = 1;                                 // actual
+const int EST = 2;                                 // estimated
+const int DEL = 3;                                 // delta = actual - nominal
+const std::list<int> STATES = { NOM, ACT, EST };
 
-// define node / source / pinger coordinate origin
-typedef struct {
-	double x0;
-	double y0;
-	double z0;
+
+// define node / source / PINGER_ coordinate origin
+typedef struct OriginStruct {
+	double x0{ 0. };
+	double y0{ 0. };
+	double z0{ 0. };
 } OriginType;
-const OriginType NODEORIGIN = { NODEX0, NODEY0, NODEZ0 };
-const OriginType SOURCEORIGIN = { SOURCEX0, SOURCEY0, SOURCEZ0 };
-const OriginType PINGERORIGIN = { PINGERX0, PINGERY0, PINGERZ0 };
+const OriginType NODE_ORIGIN = { NODE_X0, NODE_Y0, NODE_Z0 };
+const OriginType SOURCE_ORIGIN = { SOURCE_X0, SOURCE_Y0, SOURCE_Z0 };
+const OriginType PINGER_ORIGIN = { PINGER_X0, PINGER_Y0, PINGER_Z0 };
 
 
-// define node / source / pinger spacing
-typedef struct {
-	double dx;
-	double dy;
+// define node / source / PINGER_ spacing
+typedef struct SpacingStruct {
+	double dx{ 0. };
+	double dy{ 0. };
 } SpacingType;
-const SpacingType NODESPACING = { NODEDX, NODEDY };
-const SpacingType SOURCESPACING = { SOURCEDX, SOURCEDY };
-const SpacingType PINGERSPACING = { PINGERDX, PINGERDY };
+const SpacingType NODE_SPACING = { NODE_DX, NODE_DY };
+const SpacingType SOURCE_SPACING = { SOURCE_DX, SOURCE_DY };
+const SpacingType PINGER_SPACING = { PINGER_DX, PINGER_DY };
 
 
-// define node / source / pinger coordinates by combining origin and spacing
-typedef struct {
+// define node / source / PINGER_ coordinates by combining origin and spacing
+typedef struct CoordinateStruct {
 	OriginType origin;
 	SpacingType spacing;
 } CoordinateType;
-const CoordinateType NODECOORDINATE = { NODEORIGIN, NODESPACING };
-const CoordinateType SOURCECOORDINATE = { SOURCEORIGIN, SOURCESPACING };
-const CoordinateType PINGERCOORDINATE = { PINGERORIGIN, PINGERSPACING };
+const CoordinateType NODE_COORDINATE = { NODE_ORIGIN, NODE_SPACING };
+const CoordinateType SOURCE_COORDINATE = { SOURCE_ORIGIN, SOURCE_SPACING };
+const CoordinateType PINGER_COORDINATE = { PINGER_ORIGIN, PINGER_SPACING };
 
 
-// define node / source / pinger layout
-typedef struct {
-	int maxil;   // max inline number
-	int maxxl;   // max crossline number
+// define node / source / PINGER_ layout
+typedef struct ProfileStruct {
+	int maxil{ 0 };   // max inline number
+	int maxxl{ 0 };   // max crossline number
 } ProfileType;
-const ProfileType NODEPROFILE = { NODEMAXILINE, NODEMAXXLINE };
-const ProfileType SOURCEPROFILE = { SOURCEMAXILINE, SOURCEMAXXLINE };
-const ProfileType PINGERPROFILE = { PINGERMAXILINE, PINGERMAXXLINE };
+const ProfileType NODE_PROFILE = { NODE_MAX_INLINE, NODE_MAX_XLINE };
+const ProfileType SOURCE_PROFILE = { SOURCE_MAX_INLINE, SOURCE_MAX_XLINE };
+const ProfileType PINGER_PROFILE = { PINGER_MAX_INLINE, PINGER_MAX_XLINE };
 
 
 // define all-encompassing parameter
-typedef struct {
-	int flag;
+typedef struct ParamStruct {
+	int flag{ 0 };
 	CoordinateType coordinate;
 	ProfileType profile;
-} ParamType;
-const ParamType NODEPARAM = { NODEFLAG, NODECOORDINATE, NODEPROFILE };
-const ParamType SOURCEPARAM = { SOURCEFLAG, SOURCECOORDINATE, SOURCEPROFILE };
-const ParamType PINGERPARAM = { PINGERFLAG, PINGERCOORDINATE, PINGERPROFILE };
+} ParameterType;
+const ParameterType NODE_PARAMETER = { NODE_FLAG, NODE_COORDINATE, NODE_PROFILE };
+const ParameterType SOURCE_PARAMETER = { SOURCE_FLAG, SOURCE_COORDINATE, SOURCE_PROFILE };
+const ParameterType PINGER_PARAMETER = { PINGER_FLAG, PINGER_COORDINATE, PINGER_PROFILE };
 
 
 // define location
-// std::vector [NOM / ACT / EST] of Eigen::Vector3d [X, Y, Z]
-typedef std::vector<Eigen::Vector3d> LocationType;
+// std::array [NOM / ACT / EST] of Eigen::Vector3d [X, Y, Z]
+typedef std::array<Eigen::Vector3d, STATE_DIM> LocationType;   // state-many sets of coordinates per grid point
 typedef std::vector<std::vector<double>> DriftType;
-typedef struct {
-	LocationType loc;   // location of layout (inline, crossline)
-	DriftType drift;    // standard deviations of that layout's timemoment
+typedef struct GridStruct {
+	LocationType loc;                                          // location of layout (inline, crossline)
+	DriftType drift;                                           // standard deviations of that layout's driftmoment
 } GridType;
-typedef std::vector<std::vector<GridType>> LayoutType;
+
+
+// define layout
+typedef std::vector<std::vector<GridType>> LayoutType;   // 2-dimensional grid, with one GridType per grid point
 
 
 // define node / source / pinger perturbation
-typedef struct {
+typedef struct MomentStruct {
 	Eigen::Vector3d mean;
 	Eigen::Vector3d std;
 } MomentType;
 // define location scattering
-const MomentType NODELOCMOMENT = {
-	{NODEMEANX, NODEMEANY, NODEMEANZ}, {NODESTDX, NODESTDY, NODESTDZ}
+const MomentType NODE_LOCATION_PARAMETER = {
+	{NODE_MEANX, NODE_MEANY, NODE_MEANZ}, {NODE_STDX, NODE_STDY, NODE_STDZ}
 };
-const MomentType SOURCELOCMOMENT = {
-	{SOURCEMEANX, SOURCEMEANY, SOURCEMEANZ}, {SOURCESTDX, SOURCESTDY, SOURCESTDZ}
+const MomentType SOURCE_LOCATION_PARAMETER = {
+	{SOURCE_MEANX, SOURCE_MEANY, SOURCE_MEANZ}, {SOURCE_STDX, SOURCE_STDY, SOURCE_STDZ}
 };
-const MomentType PINGERLOCMOMENT = {
-	{PINGERMEANX, PINGERMEANY, PINGERMEANZ}, {PINGERSTDX, PINGERSTDY, PINGERSTDZ}
+const MomentType PINGER_LOCATION_MOMENT = {
+	{PINGER_MEANX, PINGER_MEANY, PINGER_MEANZ}, {PINGER_STDX, PINGER_STDY, PINGER_STDZ}
 };
+
+
 // define node / source time drift
-const MomentType NODETIMEMOMENT = {
-	{0., 0., 0.}, {NODESTD0, NODESTD1, NODESTD2}   // not strictly a true vector, but works
+const MomentType NODE_TIME_MOMENT = {
+	{0., 0., 0.}, {NODE_STD0, NODE_STD1, NODE_STD2}         // not strictly a true vector, but works
 };
-const MomentType SOURCETIMEMOMENT = {
-	{0., 0., 0.}, {SOURCESTD0, SOURCESTD1, SOURCESTD2}   // not strictly a true vector, but works
+const MomentType SOURCE_TIME_MOMENT = {
+	{0., 0., 0.}, {SOURCE_STD0, SOURCE_STD1, SOURCE_STD2}   // not strictly a true vector, but works
 };
-const MomentType PINGERTIMEMOMENT = {
-	{0., 0., 0.}, {0., 0., 0.}   // not strictly a true vector, but works
+const MomentType PINGER_TIME_MOMENT = {
+	{0., 0., 0.}, {0., 0., 0.}                              // not strictly a true vector, but works
 };
 
 
@@ -117,20 +131,11 @@ const std::string NOOPTION = "";   // default definition for graphics option
 
 
 // define coordinate globals
-const int SPACE = 3;   // spatial dimension
-const int X = 0;       // x coordinate
-const int Y = 1;       // y coordinate
-const int Z = 2;       // z coordinate
+const int SPACE = 3;                      // spatial dimension
+const int X = 0;                          // x coordinate
+const int Y = 1;                          // y coordinate
+const int Z = 2;                          // z coordinate
 const std::list<int> CPT = { X, Y, Z };
-
-
-// define location globals
-const int STATE = 3;   // number of states (as listed below)
-const int NOM = 0;
-const int ACT = 1;
-const int EST = 2;
-const int DEL = 3;
-const std::list<int> STATES = { NOM, ACT, EST };
 
 
 // set default values for a normal distribution

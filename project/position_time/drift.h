@@ -1,7 +1,7 @@
 //
 // Set up a time drift.
 // Converts the statistical known distributions of STD's for a drift into actual randomized STD's
-// for each individual drift. 
+// for each individual drift.
 //
 
 
@@ -17,15 +17,27 @@
 
 
 // declare class Drift
-class Drift {
+class Drift
+{
 
 private:
 	std::vector<std::vector<double>> drift;   // declare drift
 
 public:
-	Drift(MomentType);                              // construct
-	void init_drift(MomentType);                    // initialize drift
-	std::vector<std::vector<double>> get_drift();   // get drift
+	Drift(ParameterType, MomentType, int, int, Normal, bool=true);            // construct
+	std::vector<std::vector<double>> 
+		init_drift(ParameterType, MomentType, int, int, Normal, bool=true);   // initialize drift
+	inline std::vector<std::vector<double>> get_drift();                      // get drift
+
+};
+
+
+// get variable drift
+inline std::vector<std::vector<double>> Drift::get_drift()
+{
+
+	// return
+	return drift;
 
 };
 

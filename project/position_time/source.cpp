@@ -1,5 +1,5 @@
 //
-// Set up a source. 
+// Set up a source.
 // The calculation of shot times is simply hardwired. Needs improvement!
 //
 
@@ -11,10 +11,9 @@
 
 
 // define constructor for Nodes
-Sources::Sources(ParamType param, MomentType locmoment, MomentType timemoment) :
-	Param(param),                           // source param
-	Layout(param, locmoment, timemoment),   // source location and timemoment drift
-	Shot(param)                             // source shot times
-{
-
+Sources::Sources(
+	ParameterType parameter, MomentType locmoment, MomentType timemoment, Normal normal) :
+	Parameter(parameter),                                                     // parameter
+	Layout(parameter, locmoment, timemoment, normal),                         // location and time drift
+	Shot(parameter) {                                                         // shot times
 };

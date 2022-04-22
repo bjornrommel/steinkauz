@@ -12,22 +12,29 @@
 #include <Dense>
 #include "config.h"
 #include "define.h"
-#include "param.h"
 
 
-// declare an abstract class Device
+// declare an abstract class Location
 class Location 
 {
 
 private:
-	int index;          // index number per node
-	LocationType loc;   // location of node (x, y, z)
+	int index;               // index number per node
+	LocationType location;   // location of node (x, y, z)
 
 public:
-	Location(ParamType, MomentType, int, int);        // construct
-	void init_index(ParamType, int, int);                     // assign index number
-	void init_loc(ParamType, MomentType, int, int);   // assign location
-	std::vector<Eigen::Vector3d> get_loc();                      // get location
+	Location(ParameterType, MomentType, int, int, Normal, bool = true);           // construct
+	void init_index(ParameterType, int, int);                                     // assign index number
+	void init_location(ParameterType, MomentType, int, int, Normal, bool=true);   // assign location
+	inline LocationType get_location() const;                                     // get location
+
+};
+
+
+inline LocationType Location::get_location() const {
+
+	// return loc
+	return location;
 
 };
 

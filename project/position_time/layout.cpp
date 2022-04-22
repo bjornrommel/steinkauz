@@ -1,11 +1,12 @@
 //
-// Set up a grid of node, source or pinger.
+// Set up a grid of node, source or PINGER_.
 // grid.loc contains the location of all devices within the given in- and crosslines.
 //
 
 
 // include headers
-#include<iostream>
+#include <iostream>
+#include <iomanip>
 #include "define.h"
 #include "layout.h"
 #include "location.h"
@@ -13,73 +14,44 @@
 
 
 // define constructor for Layout
-Layout::Layout(ParamType param, MomentType locmoment, MomentType timemoment)
-{
-
-	// initialize grid
-	layout = init_layout(param, locmoment, timemoment);   // outsource
-
+Layout::Layout(ParameterType parameter, MomentType locmoment, MomentType driftmoment, Normal normal) :
+	playout(init_layout(parameter, locmoment, driftmoment, normal)) {
 };
 
 
 // define function for init_layout
-LayoutType Layout::init_layout(ParamType param, MomentType locmoment, MomentType timemoment)
-{
+std::shared_ptr<LayoutType>
+	Layout::init_layout(
+		ParameterType parameter, MomentType locmoment, MomentType driftmoment, Normal normal) {
 
 	// initialize and assign memory
-	Location loc(param, locmoment, 0, 0);
-	Drift drift(timemoment);
-	LayoutType
-		layout(
-			param.profile.maxil,
-			std::vector<GridType>(param.profile.maxxl, { loc.get_loc(), drift.get_drift() }));
-
-	// initialize grid with correct node location and timemoment STD's
-	for (int il = 0; il < param.profile.maxil; il++) {       // inline loop
-		for (int xl = 0; xl < param.profile.maxxl; xl++) {   // crossline loop
-			Location loc(param, locmoment, il, xl);          // node location
-			layout[il][xl].loc = loc.get_loc();                // assign to grid
-			Drift drift(timemoment);                         // clock time
-			layout[il][xl].drift = drift.get_drift();          // assign to grid
-		};
+	ProfileType profile = parameter.profile;
+	Location location(parameter, locmoment, 0, 0, normal, false);   // location
+	Drift drift(parameter, driftmoment, 0, 0, normal, false);       // time drift
+	std::shared_ptr<LayoutType> playout{
+		std::make_shared < LayoutType >(
+			LayoutType{
+				static_cast<unsigned int> (profile.maxil),
+				std::vector<GridType>(
+					static_cast<unsigned int> (profile.maxxl), {
+						location.get_location(),                    // get location
+						drift.get_drift()                           // get time drift
+					}
+				)
+			}
+		)
 	};
 
+	// initialize grid with correct node location and clock drift STD's
+	for (int il = 0; il < profile.maxil; il++) {                       // inline loop
+		for (int xl = 0; xl < profile.maxxl; xl++) {                   // crossline loop
+			Location location(parameter, locmoment, il, xl, normal);   // node location
+			(*playout)[il][xl].loc = location.get_location();          // to pointer to layout of grid
+			Drift drift(parameter, driftmoment, il, xl, normal);       // clock time
+			(*playout)[il][xl].drift = drift.get_drift();              // to pointer of layout of grid
+		};
+	};
 	// return
-	return layout;
-};
-
-
-// define function for get_layout
-LayoutType Layout::get_layout() {
-
-	// return layout
-	return layout;
-
-};
-
-
-// define function for put_layout
-void Layout::set_layout(LayoutType layout1) {
-
-	// overwrite layout
-	layout = layout1;
-
-};
-
-
-// define function for get_loc
-std::vector<Eigen::Vector3d> Layout::get_loc(int ni, int nx) {
-
-	// return loc
-	return layout[ni][nx].loc;
-
-};
-
-
-// define function for set_coord
-void Layout::set_coord(int ni, int nx, int state, Eigen::Vector3d coord) {
-
-	// assign loc to a point in layout
-	layout[ni][nx].loc[state] = coord;
+	return playout;
 
 };

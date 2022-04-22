@@ -4,19 +4,18 @@
 
 
 // guard
-#if !defined MY_NODE_H
-#define MY_NODE_H
+#if !defined MY_PINGER_H
+#define MY_PINGER_H
 
 
 // include headers
 #include "define.h"
 #include "parameter.h"
 #include "layout.h"
-#include "normal.h"
 
 
-// declare class Nodes
-class Nodes :
+// declare class Pingers
+class Pingers :
 	public Parameter, public Layout {
 
 private:
@@ -24,7 +23,7 @@ private:
 	// layout to be declared in the inherited class Layout
 
 public:
-	Nodes(ParameterType, MomentType, MomentType, Normal);   // construct
+	Pingers(ParameterType, MomentType, MomentType, Normal);   // construct
 
 };
 

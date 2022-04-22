@@ -9,16 +9,15 @@
 
 
 // declare class Shot
-class Shot
-{
+class Shot {
 
 private:
-	std::vector<std::vector<double>> shot;         // declare shot times
-	void init_shot(ParamType);                     // create shot times
-	std::vector<std::vector<double>> get_shot();   // return shot times
+	std::vector<std::vector<double>> shot;   // declare shot times
+	void init_shot(ParameterType);           // create shot times
 
 public:
-	Shot(ParamType);   // construct
+	Shot(ParameterType);                           // construct
+	std::vector<std::vector<double>> get_shot();   // return shot times
 
 };
 

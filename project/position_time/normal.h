@@ -14,8 +14,7 @@
 
 
 // declare a class normal for normal distribution
-class Normal
-{
+class Normal {
 
 public:
 	Normal();              // constructor
@@ -29,8 +28,7 @@ private:
 
 
 // define get_normal inline
-inline double Normal::get_normal()
-{
+inline double Normal::get_normal() {
 
 	// return one random number: distribution is set to normal, generator contains seed
 	return distribution(generator);

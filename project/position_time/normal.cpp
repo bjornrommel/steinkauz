@@ -13,8 +13,7 @@
 
 
 // define constructor for Normal, which seeds and defines the general properties of a normal distribution
-Normal::Normal()
-{
+Normal::Normal() {
 
 	// set seed and mean / std of a normal distribution
 	std::random_device device;                                  // random device

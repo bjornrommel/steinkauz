@@ -1,5 +1,6 @@
 //
-// Set up a table of distance and traveltime derivatives.
+// Set up a table of distance and traveltime derivatives
+// and invert for the actual position of nodes
 //
 
 
@@ -11,22 +12,20 @@
 // include headers
 #include <Dense>
 #include "define.h"
-#include "node.h"
-#include "source.h"
 
 
 // declare a class Table
-class Table {
+class Table
+{
 
 private:
 	std::vector<Eigen::Vector2d> time;   // travel times
 
 public:
-	Table(Sources, Nodes, Nodes);                             // construct
-
+	Table(Sources, Nodes, Pingers);                           // construct
 	Eigen::VectorXd get_act_time(Sources, Nodes, int, int);   // get nominal time
 	auto get_est_time_forward(Sources, Nodes, int, int);
-	void init_table(Sources, Nodes, Nodes);                   // set up a forward operator
+	void init_table(Sources, Nodes, Pingers);                 // set up a forward operator
 
 };
 

@@ -10,16 +10,15 @@
 
 // include headers
 #include <vector>
-#include "config.h"
 #include "define.h"
-#include "param.h"
+#include "parameter.h"
 #include "layout.h"
 #include "shot.h"
+#include "normal.h"
 
 
 // declare class Nodes
-class Sources : public Param, public Layout, public Shot
-{
+class Sources : public Parameter, public Layout, public Shot {
 
 private:
 	// param to be declared in the inherited class Param
@@ -27,7 +26,7 @@ private:
 	// shot to be declared in the inherited class Shot
 
 public:
-	Sources(ParamType, MomentType, MomentType);   // construct
+	Sources(ParameterType, MomentType, MomentType, Normal);   // construct
 
 };
 

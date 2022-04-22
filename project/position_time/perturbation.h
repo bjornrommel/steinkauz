@@ -15,16 +15,14 @@
 
 
 // declare a class Perturbation of normal distribution
-class Perturbation
-{
+class Perturbation {
 
 public:
-	Perturbation();                                 // construct
-	Eigen::VectorXd get_perturb(MomentType, int);   // get perturbation with mean, std
+	Perturbation();                                              // construct
+	Eigen::VectorXd get_perturbation(MomentType, int, Normal);   // get perturbation with mean, std
 
 private:
-	Normal normal;             // contain properties of a normal distribution
-	Eigen::VectorXd perturb;   // perturbation vector
+	Eigen::VectorXd perturbation;   // perturbation vector
 
 };
 

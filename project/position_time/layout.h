@@ -1,5 +1,5 @@
 //
-// Set up a layout of node, source or pinger.
+// Set up a layout of node, source or PINGER_.
 //
 
 
@@ -9,24 +9,43 @@
 
 
 // include headers
+#include <iostream>
 #include <vector>
 #include "define.h"
+#include "normal.h"
 
 
 // declare class Layout
-class Layout
-{
+class Layout {
 
 private:
-	LayoutType layout;   // declare layout
+	std::shared_ptr<LayoutType> playout;   // pointer to layout
 
 public:
-	Layout(ParamType, MomentType, MomentType);                   // construct
-	LayoutType init_layout(ParamType, MomentType, MomentType);   // set up the layout
-	LayoutType get_layout();                                     // get the (entire) layout
-	void set_layout(LayoutType);                                 // set the (entire) layout
-	std::vector<Eigen::Vector3d> get_loc(int, int);              // get the location for one layout point
-	void set_coord(int, int, int, Eigen::Vector3d);
+	Layout(ParameterType, MomentType, MomentType, Normal);            // construct
+	std::shared_ptr<LayoutType>
+		init_layout(ParameterType, MomentType, MomentType, Normal);   // set up the layout
+	inline std::shared_ptr<LayoutType> get_layout() const;            // get the (entire) layout
+	inline std::shared_ptr<LayoutType>
+		set_layout(std::shared_ptr<LayoutType> playout);              // get the (entire) layout
+
+};
+
+
+// define function for get_layout
+inline std::shared_ptr<LayoutType> Layout::get_layout() const {
+
+	// return layout
+	return playout;
+
+};
+
+
+// define function for get_layout
+inline std::shared_ptr<LayoutType> Layout::set_layout(std::shared_ptr<LayoutType> playout1) {
+
+	// return layout
+	playout = playout1;
 
 };
 
