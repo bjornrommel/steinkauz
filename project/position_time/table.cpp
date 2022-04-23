@@ -46,12 +46,7 @@ Eigen::VectorXd Table::get_act_time(Sources sources, Nodes nodes, int ni, int nx
 		for (int sx = 0; sx < sou_profile.maxxl; sx++) {    // crossline loop
 			sou_loc =
 				(*sources.get_layout())[si][sx].loc[ACT];   // extract actual source location
-			dist =                                          // distance source->node
-				pow(
-					pow(sou_loc[X] - nod_loc[X], 2) +
-					pow(sou_loc[Y] - nod_loc[Y], 2) +
-					pow(sou_loc[Z] - nod_loc[Z], 2),
-					0.5);
+			dist = (sou_loc - nod_loc).norm();              // distance
 			time[row] = dist / VEL;                         // actual traveltime
 			row++;                                          // increment source loop counter
 		};
@@ -98,22 +93,12 @@ auto Table::get_est_time_forward(Sources sources, Nodes nodes, int ni, int nx) {
 	Eigen::VectorXd nod_loc = (*nodes.get_layout())[ni][nx].loc[EST];
 
 	// loop over all sources calculating estimated traveltimes and forward operator
-	for (int si = 0; si < sou_profile.maxil; si++) {              // inline loop
-		for (int sx = 0; sx < sou_profile.maxxl; sx++) {          // crossline loop
-			sou_loc = (*sources.get_layout())[si][sx].loc[EST];   // extract estimated source location
-			dist =                                                // distance
-				pow(
-					pow(sou_loc[X] - nod_loc[X], 2) +
-					pow(sou_loc[Y] - nod_loc[Y], 2) +
-					pow(sou_loc[Z] - nod_loc[Z], 2),
-					0.5);
-			forward.row(row) = Eigen::Vector3d(                   // forward operator
-				sou_loc[X] - nod_loc[X],
-				sou_loc[Y] - nod_loc[Y],
-				sou_loc[Z] - nod_loc[Z]
-			);
-			forward.row(row) /= (dist * VEL);
-			time[row] = dist / VEL;                               // estimated traveltime
+	for (int si = 0; si < sou_profile.maxil; si++) {                 // inline loop
+		for (int sx = 0; sx < sou_profile.maxxl; sx++) {             // crossline loop
+			sou_loc = (*sources.get_layout())[si][sx].loc[EST];      // estimated source location
+			dist = (sou_loc - nod_loc).norm();                       // distance
+			forward.row(row) = (sou_loc - nod_loc) / (dist * VEL);   // forward operator
+			time[row] = dist / VEL;                                  // estimated traveltime
 			row++;
 		};
 	};
