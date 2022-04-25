@@ -32,29 +32,28 @@ Eigen::VectorXd Table::get_act_time(Sources sources, Nodes nodes, int ni, int nx
 	int row = 0;
 	double dist = 0.;
 
-	Eigen::VectorXd sou_loc = Eigen::VectorXd::Zero(3);
-
 	// define traveltime
 	Eigen::VectorXd time = Eigen::VectorXd::Zero(sou_profile.maxil * sou_profile.maxxl);
 
-	// current actual node location
-	Eigen::VectorXd nod_loc = (*nodes.get_layout())[ni][nx].loc[ACT];
-
 	// loop over all sources calculating traveltimes
 	row = 0;
-	for (int si = 0; si < sou_profile.maxil; si++) {        // inline loop
-		for (int sx = 0; sx < sou_profile.maxxl; sx++) {    // crossline loop
-			sou_loc =
-				(*sources.get_layout())[si][sx].loc[ACT];   // extract actual source location
-			dist = (sou_loc - nod_loc).norm();              // distance
-			time[row] = dist / VEL;                         // actual traveltime
-			row++;                                          // increment source loop counter
+	for (int si = 0; si < sou_profile.maxil; si++) {           // inline loop
+		for (int sx = 0; sx < sou_profile.maxxl; sx++) {       // crossline loop
+			dist =                                             // distance
+				(
+					(*sources.get_layout())[si][sx].loc[ACT]
+					-
+					(*nodes.get_layout())[ni][nx].loc[ACT]
+					).norm();
+			time[row] = dist / VEL;                            // estimated traveltime
+			row++;
 		};
 	};
-	row--;                                                  // decrement source loop counter
+	row--;                                                    // decrement source loop counter
 
 	// print
 	if (PRINT_ITERATION) {
+		Eigen::VectorXd nod_loc = (*nodes.get_layout())[ni][nx].loc[ACT];
 		std::cout.setf(std::ios::fixed, std::ios::floatfield);
 		std::cout.precision(3);
 		std::cout << "node location" << std::endl;
@@ -80,32 +79,39 @@ auto Table::get_est_time_forward(Sources sources, Nodes nodes, int ni, int nx) {
 	int row = 0;
 	double dist = 0.;
 
-	// define actual source location
-	Eigen::VectorXd sou_loc = Eigen::VectorXd::Zero(SPACE);
-
 	// define traveltime
 	Eigen::VectorXd time = Eigen::VectorXd::Zero(sou_profile.maxil * sou_profile.maxxl);
 
 	// define forward operator
 	Eigen::MatrixXd forward(sou_profile.maxil * sou_profile.maxxl, SPACE);
 
-	// current estimated node location
-	Eigen::VectorXd nod_loc = (*nodes.get_layout())[ni][nx].loc[EST];
-
 	// loop over all sources calculating estimated traveltimes and forward operator
 	for (int si = 0; si < sou_profile.maxil; si++) {                 // inline loop
 		for (int sx = 0; sx < sou_profile.maxxl; sx++) {             // crossline loop
-			sou_loc = (*sources.get_layout())[si][sx].loc[EST];      // estimated source location
-			dist = (sou_loc - nod_loc).norm();                       // distance
-			forward.row(row) = (sou_loc - nod_loc) / (dist * VEL);   // forward operator
+			dist =                                                   // distance
+				(
+					(*sources.get_layout())[si][sx].loc[EST]
+					-
+					(*nodes.get_layout())[ni][nx].loc[EST]
+				).norm();
+			forward.row(row) =
+				(                                                    // forward operator
+					(*sources.get_layout())[si][sx].loc[EST]
+					-
+					(*nodes.get_layout())[ni][nx].loc[EST]
+				)
+				/
+				dist;
 			time[row] = dist / VEL;                                  // estimated traveltime
 			row++;
 		};
 	};
+	forward /= VEL;
 	row--;
 
 	// print
 	if (PRINT_ITERATION) {
+		Eigen::VectorXd nod_loc = (*nodes.get_layout())[ni][nx].loc[EST];
 		std::cout.setf(std::ios::fixed, std::ios::floatfield);
 		std::cout.precision(3);
 		std::cout
