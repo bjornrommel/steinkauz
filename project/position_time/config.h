@@ -16,22 +16,22 @@
 
 
 // define node globals
-const int NODE_MAX_INLINE = 3;     // maximal number of inline lines
-const int NODE_MAX_XLINE = 3;      // maximal number of crossline lines
-const double NODE_X0 = 50.;        // inline origin
-const double NODE_Y0 = 50.;        // crossline origin
-const double NODE_Z0 = 1000.;      // depth origin
-const double NODE_DX = 50.;        // inline spacing
-const double NODE_DY = 50.;        // crossline spacing
-const double NODE_MEANX = 0.;      // inline perturbation mean
-const double NODE_MEANY = 0.;      // crossline perturbation mean
-const double NODE_MEANZ = 0.;      // vertical perturbation mean
-const double NODE_STDX = 10.;      // inline perturbation standard deviation
-const double NODE_STDY = 10.;      // crossline perturbation standard deviation
-const double NODE_STDZ = 5.;       // vertical perturbation standard deviation
-const double NODE_STD0 = 0.001;    // time drift 0. order standard deviation
-const double NODE_STD1 = 0.0001;   // time drift 1. order standard deviation
-const double NODE_STD2 = 0.00001;  // time drift 2. order standard deviation
+const int NODE_MAX_INLINE = 3;      // maximal number of inline lines
+const int NODE_MAX_XLINE = 3;       // maximal number of crossline lines
+const double NODE_X0 = 50.;         // inline origin
+const double NODE_Y0 = 50.;         // crossline origin
+const double NODE_Z0 = 1000.;       // depth origin
+const double NODE_DX = 50.;         // inline spacing
+const double NODE_DY = 50.;         // crossline spacing
+const double NODE_MEANX = 0.;       // inline perturbation mean
+const double NODE_MEANY = 0.;       // crossline perturbation mean
+const double NODE_MEANZ = 0.;       // vertical perturbation mean
+const double NODE_STDX = 10.;       // inline perturbation standard deviation
+const double NODE_STDY = 10.;       // crossline perturbation standard deviation
+const double NODE_STDZ = 5.;        // vertical perturbation standard deviation
+const double NODE_STD0 = 0.001;     // time drift 0. order standard deviation
+const double NODE_STD1 = 0.0001;    // time drift 1. order standard deviation
+const double NODE_STD2 = 0.00001;   // time drift 2. order standard deviation
 
 
 // define time globals
@@ -40,23 +40,23 @@ const double TIME_SAMP_RATE = 4.;   // sampling rate
 
 
 // define source globals
-const int SOURCE_MAX_INLINE = 3;     // maximal number of inline lines
-const int SOURCE_MAX_XLINE = 3;      // maximal number of crossline lines
-const double SOURCE_X0 = 0.;         // inline origin
-const double SOURCE_Y0 = 0.;         // crossline origin
-const double SOURCE_Z0 = 0.;         // depth origin
-const double SOURCE_DX = 100.;       // inline spacing
-const double SOURCE_DY = 100.;       // crossline spacing
-const double SOURCE_MEANX = 0.;      // inline perturbation
-const double SOURCE_MEANY = 0.;      // crossline perturbation
-const double SOURCE_MEANZ = 0.;      // vertical perturbation
-const double SOURCE_STDX = 0.;       // inline perturbation
-const double SOURCE_STDY = 0.;       // crossline perturbation
-const double SOURCE_STDZ = 0.;       // vertical perturbation
-const double SOURCE_DT = 20.;        // nominal shot time interval
-const double SOURCE_STD0 = 0.0000;   // source 0. order standard deviation (source time variation)
-const double SOURCE_STD1 = 0.;       // source 1. order mean (not typically applicable)
-const double SOURCE_STD2 = 0.;       // source 2. order standard deviation (not typically applicable)
+const int SOURCE_MAX_INLINE = 3;    // maximal number of inline lines
+const int SOURCE_MAX_XLINE = 3;     // maximal number of crossline lines
+const double SOURCE_X0 = 0.;        // inline origin
+const double SOURCE_Y0 = 0.;        // crossline origin
+const double SOURCE_Z0 = 0.;        // depth origin
+const double SOURCE_DX = 100.;      // inline spacing
+const double SOURCE_DY = 100.;      // crossline spacing
+const double SOURCE_MEANX = 0.;     // inline perturbation
+const double SOURCE_MEANY = 0.;     // crossline perturbation
+const double SOURCE_MEANZ = 0.;     // vertical perturbation
+const double SOURCE_STDX = 0.;      // inline perturbation
+const double SOURCE_STDY = 0.;      // crossline perturbation
+const double SOURCE_STDZ = 0.;      // vertical perturbation
+const double SOURCE_DT = 20.;       // nominal shot time interval
+const double SOURCE_STD0 = 0.001;   // source 0. order standard deviation (source time variation)
+const double SOURCE_STD1 = 0.;      // source 1. order standard deviation
+const double SOURCE_STD2 = 0.;      // source 2. order standard deviation 
 
 
 // define globals
@@ -80,9 +80,9 @@ const double VEL = 1500;   // sound velocity
 
 
 // printouts
-const bool PRINT_ITERATION = false;   // print iteration results
-const bool PRINT_LOCATION = false;    // print location of devices
-const bool PRINT_DRIFT = false;       // print clock drift parameters pf devices
+const bool PRINT_ITERATION = true;   // print iteration results
+const bool PRINT_LOCATION = true;    // print location of devices
+const bool PRINT_DRIFT = true;       // print clock drift parameters pf devices
 
 
 // inversion

@@ -11,7 +11,7 @@ Modifying the subsurface, and the velocity of a seismic wave travelling through 
 ## C++
 
 - [Positioning and Timing of Nodes](https://github.com/bjornrommel/steinkauz/tree/master/project/position_time)
-Deploying nodes is not perfect: nodes are usually slightly mis-positioned. Furthermore, the clocks used in nodes tend to drift over time. Using source location, all available first breaks and pinger time signals, however, the position of nodes and their time drifts can be determined.  
+Deploying nodes is not perfect: nodes are usually slightly mis-positioned. Furthermore, the clocks used in nodes tend to drift over time. Using source location, all available first breaks and later pinger time signals, however, the position of nodes and their time drifts can be determined.  
 
 ## Notebooks
 
