@@ -23,7 +23,7 @@ private:
 	// layout to be declared in the inherited class Layout
 
 public:
-	Pingers(ParameterType, MomentType, MomentType, Normal);   // construct
+	Pingers(ParameterType, MomentType, MomentType);   // construct
 
 };
 

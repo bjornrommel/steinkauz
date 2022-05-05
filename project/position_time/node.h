@@ -12,7 +12,6 @@
 #include "define.h"
 #include "parameter.h"
 #include "layout.h"
-#include "normal.h"
 
 
 // declare class Nodes
@@ -24,7 +23,7 @@ private:
 	// layout to be declared in the inherited class Layout
 
 public:
-	Nodes(ParameterType, MomentType, MomentType, Normal);   // construct
+	Nodes(ParameterType, MomentType, MomentType);   // construct
 
 };
 

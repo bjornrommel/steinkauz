@@ -21,20 +21,18 @@ class Drift
 {
 
 private:
-	std::vector<std::vector<double>> drift;   // declare drift
+	DriftType drift;   // declare drift
 
 public:
-	Drift(ParameterType, MomentType, int, int, Normal, bool=true);            // construct
-	std::vector<std::vector<double>> 
-		init_drift(ParameterType, MomentType, int, int, Normal, bool=true);   // initialize drift
-	inline std::vector<std::vector<double>> get_drift();                      // get drift
+	Drift(ParameterType, MomentType, int, int, bool=true);                  // construct
+	DriftType init_drift(ParameterType, MomentType, int, int, bool=true);   // initialize drift
+	inline DriftType get_drift() const;                                     // get drift
 
 };
 
 
 // get variable drift
-inline std::vector<std::vector<double>> Drift::get_drift()
-{
+inline DriftType Drift::get_drift() const {
 
 	// return
 	return drift;

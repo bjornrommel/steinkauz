@@ -14,22 +14,22 @@
 
 
 // define constructor for Layout
-Layout::Layout(ParameterType parameter, MomentType locmoment, MomentType driftmoment, Normal normal) :
-	playout(init_layout(parameter, locmoment, driftmoment, normal)) {
+Layout::Layout(ParameterType parameter, MomentType locmoment, MomentType driftmoment) :
+	playout(init_layout(parameter, locmoment, driftmoment)) {
 };
 
 
 // define function for init_layout
 std::shared_ptr<LayoutType>
 	Layout::init_layout(
-		ParameterType parameter, MomentType locmoment, MomentType driftmoment, Normal normal) {
+		ParameterType parameter, MomentType locmoment, MomentType driftmoment) {
 
 	// initialize and assign memory
 	ProfileType profile = parameter.profile;
-	Location location(parameter, locmoment, 0, 0, normal, false);   // location
-	Drift drift(parameter, driftmoment, 0, 0, normal, false);       // time drift
+	Location location(parameter, locmoment, 0, 0, false);   // location
+	Drift drift(parameter, driftmoment, 0, 0, false);       // time drift
 	std::shared_ptr<LayoutType> playout{
-		std::make_shared < LayoutType >(
+		std::make_shared <LayoutType>(
 			LayoutType{
 				static_cast<unsigned int> (profile.maxil),
 				std::vector<GridType>(
@@ -42,13 +42,14 @@ std::shared_ptr<LayoutType>
 		)
 	};
 
+
 	// initialize grid with correct node location and clock drift STD's
-	for (int il = 0; il < profile.maxil; il++) {                       // inline loop
-		for (int xl = 0; xl < profile.maxxl; xl++) {                   // crossline loop
-			Location location(parameter, locmoment, il, xl, normal);   // node location
-			(*playout)[il][xl].loc = location.get_location();          // to pointer to layout of grid
-			Drift drift(parameter, driftmoment, il, xl, normal);       // clock time
-			(*playout)[il][xl].drift = drift.get_drift();              // to pointer of layout of grid
+	for (int il = 0; il < profile.maxil; il++) {                // inline loop
+		for (int xl = 0; xl < profile.maxxl; xl++) {            // crossline loop
+			Location location(parameter, locmoment, il, xl);    // node location
+			(*playout)[il][xl].loc = location.get_location();   // to pointer to layout of grid
+			Drift drift(parameter, driftmoment, il, xl);        // clock time
+			(*playout)[il][xl].drift = drift.get_drift();       // to pointer of layout of grid
 		};
 	};
 	// return

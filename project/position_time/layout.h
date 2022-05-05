@@ -12,7 +12,6 @@
 #include <iostream>
 #include <vector>
 #include "define.h"
-#include "normal.h"
 
 
 // declare class Layout
@@ -22,12 +21,12 @@ private:
 	std::shared_ptr<LayoutType> playout;   // pointer to layout
 
 public:
-	Layout(ParameterType, MomentType, MomentType, Normal);            // construct
+	Layout(ParameterType, MomentType, MomentType);            // construct
 	std::shared_ptr<LayoutType>
-		init_layout(ParameterType, MomentType, MomentType, Normal);   // set up the layout
-	inline std::shared_ptr<LayoutType> get_layout() const;            // get the (entire) layout
+		init_layout(ParameterType, MomentType, MomentType);   // set up the layout
+	inline std::shared_ptr<LayoutType> get_layout() const;    // get the (entire) layout
 	inline std::shared_ptr<LayoutType>
-		set_layout(std::shared_ptr<LayoutType> playout);              // get the (entire) layout
+		set_layout(std::shared_ptr<LayoutType> playout);      // set the (entire) layout
 
 };
 

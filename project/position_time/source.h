@@ -14,7 +14,6 @@
 #include "parameter.h"
 #include "layout.h"
 #include "shot.h"
-#include "normal.h"
 
 
 // declare class Nodes
@@ -26,7 +25,7 @@ private:
 	// shot to be declared in the inherited class Shot
 
 public:
-	Sources(ParameterType, MomentType, MomentType, Normal);   // construct
+	Sources(ParameterType, MomentType, MomentType);   // construct
 
 };
 

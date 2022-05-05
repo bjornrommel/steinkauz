@@ -20,12 +20,16 @@ const int SOURCE_FLAG{ 2 };
 const int PINGER_FLAG{ 3 };
 const std::vector<std::string> DEVICE = { "node:", "source:", "pinger:" };
 
+
+// define drift globals
+const int DRIFT = 3;
+
+
 // define location globals
-const int STATE_DIM = 4;                           // number of states (as listed below)
+const int STATE = 3;                               // number of states (as listed below)
 const int NOM = 0;                                 // nominal
 const int ACT = 1;                                 // actual
 const int EST = 2;                                 // estimated
-const int DEL = 3;                                 // delta = actual - nominal
 const std::list<int> STATES = { NOM, ACT, EST };
 
 
@@ -83,16 +87,16 @@ const ParameterType PINGER_PARAMETER = { PINGER_FLAG, PINGER_COORDINATE, PINGER_
 
 // define location
 // std::array [NOM / ACT / EST] of Eigen::Vector3d [X, Y, Z]
-typedef std::array<Eigen::Vector3d, STATE_DIM> LocationType;   // state-many sets of coordinates per grid point
-typedef std::vector<std::vector<double>> DriftType;
+typedef std::array<Eigen::Vector3d, STATE> LocationType;   // state-many sets of coordinates per grid point
+typedef std::array<Eigen::VectorXd, DRIFT> DriftType;      // drift-many sets of time drifts per grid point
 typedef struct GridStruct {
-	LocationType loc;                                          // location of layout (inline, crossline)
-	DriftType drift;                                           // standard deviations of that layout's driftmoment
+	LocationType loc;                                      // location of layout (inline, crossline)
+	DriftType drift;                                       // time drift of nodes
 } GridType;
 
 
 // define layout
-typedef std::vector<std::vector<GridType>> LayoutType;   // 2-dimensional grid, with one GridType per grid point
+typedef std::vector<std::vector<GridType>> LayoutType;   // 2-dimensional grid
 
 
 // define node / source / pinger perturbation
@@ -114,13 +118,13 @@ const MomentType PINGER_LOCATION_MOMENT = {
 
 // define node / source time drift
 const MomentType NODE_TIME_MOMENT = {
-	{0., 0., 0.}, {NODE_STD0, NODE_STD1, NODE_STD2}         // not strictly a true vector, but works
+	{0., 0., 0.}, {NODE_STD0, NODE_STD1, NODE_STD2}
 };
 const MomentType SOURCE_TIME_MOMENT = {
-	{0., 0., 0.}, {SOURCE_STD0, SOURCE_STD1, SOURCE_STD2}   // not strictly a true vector, but works
+	{0., 0., 0.}, {SOURCE_STD0, SOURCE_STD1, SOURCE_STD2}
 };
 const MomentType PINGER_TIME_MOMENT = {
-	{0., 0., 0.}, {0., 0., 0.}                              // not strictly a true vector, but works
+	{0., 0., 0.}, {0., 0., 0.}
 };
 
 

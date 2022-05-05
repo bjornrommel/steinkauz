@@ -27,7 +27,7 @@ Graphics::Graphics(Sources sources, Nodes nodes, Pingers pingers) {
 	open();
 
 	// plot pingers
-	plot_layout(pingers.get_layout(), pingers.get_parameter().profile, "blue");
+	// plot_layout(pingers.get_layout(), pingers.get_parameter().profile, "blue");
 
 	// plot sources
 	plot_layout(sources.get_layout(), sources.get_parameter().profile, "red");

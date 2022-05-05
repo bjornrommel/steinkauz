@@ -12,7 +12,7 @@
 
 // define constructor for Pingers
 Pingers::Pingers
-	(ParameterType parameter, MomentType locmoment, MomentType driftmoment, Normal normal) :
-	Parameter(parameter),                                 // parameters
-	Layout(parameter, locmoment, driftmoment, normal) {   // location and clock drift
+	(ParameterType parameter, MomentType locmoment, MomentType driftmoment) :
+	Parameter(parameter),                         // parameters
+	Layout(parameter, locmoment, driftmoment) {   // location and clock drift
 };

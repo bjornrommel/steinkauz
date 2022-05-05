@@ -13,27 +13,26 @@
 
 // define constructor for Drift
 Drift::Drift(
-	ParameterType parameter, MomentType driftmoment, int il, int xl, Normal normal, bool production) :
-	drift(init_drift(parameter, driftmoment, il, xl, normal, production)) {
+	ParameterType parameter, MomentType driftmoment, int il, int xl, bool production) :
+	drift(init_drift(parameter, driftmoment, il, xl, production)) {
 };
 
 
 // initialize variable drift
-std::vector<std::vector<double>>
+DriftType
 	Drift::init_drift(
-		ParameterType parameter, MomentType driftmoment, int il, int xl, Normal normal, bool production)
-{
+		ParameterType parameter, MomentType driftmoment, int il, int xl, bool production) {
 
 	// get perturbation for STD's
 	Perturbation perturbation;
-	Eigen::VectorXd scatter =
-		perturbation.get_perturbation(driftmoment, 3, normal);   // not a true vector, but works below
+	Eigen::VectorXd scatter = perturbation.get_perturbation(driftmoment, 3);
 
 	// assign perturbations and construct drift
-	std::vector<std::vector<double>> drift = {
-		{0., 0., 0.},                            // nominal (to comply with NOM, ACT, EST notation)
-		{scatter[0], scatter[1], scatter[2]},    // actual
-		{0., 0., 0.}                             // estimated
+	Eigen::VectorXd empty = Eigen::VectorXd::Zero(DRIFT);
+	DriftType drift = {
+		empty,     // nominal
+		scatter,   // actual
+		empty      // estimated
 	};
 
 	// exclude memory assignment only
@@ -44,7 +43,8 @@ std::vector<std::vector<double>>
 			std::cout.setf(std::ios::fixed, std::ios::floatfield);
 			std::cout.precision(6);
 			std::cout
-				<< DEVICE[size_t(parameter.flag) - 1] << " (" << il << ", " << xl << ") time drift"
+				<< DEVICE[size_t(parameter.flag) - 1]
+				<< " (" << il << ", " << xl << ") time drift"
 				<< std::endl;
 			std::cout.setf(std::ios::showpos);
 			std::cout

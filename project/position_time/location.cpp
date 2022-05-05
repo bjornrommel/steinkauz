@@ -17,11 +17,11 @@
 
 // define constructor for Location
 Location::Location(
-	ParameterType parameter, MomentType locmoment, int il, int xl, Normal normal, bool production) {
+	ParameterType parameter, MomentType locmoment, int il, int xl, bool production) {
 
 	// declare variables
-	init_index(parameter, il, xl);                                     // outsource index number
-	init_location(parameter, locmoment, il, xl, normal, production);   // outsource location
+	init_index(parameter, il, xl);                             // outsource index number
+	init_location(parameter, locmoment, il, xl, production);   // outsource location
 
 };
 
@@ -40,7 +40,7 @@ void Location::init_index(ParameterType parameter, int il, int xl) {
 
 // define function for init_loc
 void Location::init_location(
-	ParameterType parameter, MomentType locmoment, int il, int xl, Normal normal, bool production)
+	ParameterType parameter, MomentType locmoment, int il, int xl, bool production)
 {
 
 	// initialize location
@@ -56,12 +56,9 @@ void Location::init_location(
 	// exclude when assigning memory
 	if (production) {
 
-		// get perturbation
-		Perturbation perturbation;
-		Eigen::Vector3d scatter = perturbation.get_perturbation(locmoment, SPACE, normal);
-
 		// actual = summing location + perturbation
-		location[ACT] += scatter;
+		Perturbation perturbation;
+		location[ACT] += perturbation.get_perturbation3(locmoment);
 
 		// print
 		if (PRINT_LOCATION) {

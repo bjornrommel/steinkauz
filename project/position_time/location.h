@@ -15,7 +15,7 @@
 
 
 // declare an abstract class Location
-class Location 
+class Location
 {
 
 private:
@@ -23,10 +23,10 @@ private:
 	LocationType location;   // location of node (x, y, z)
 
 public:
-	Location(ParameterType, MomentType, int, int, Normal, bool = true);           // construct
-	void init_index(ParameterType, int, int);                                     // assign index number
-	void init_location(ParameterType, MomentType, int, int, Normal, bool=true);   // assign location
-	inline LocationType get_location() const;                                     // get location
+	Location(ParameterType, MomentType, int, int, bool = true);           // construct
+	void init_index(ParameterType, int, int);                             // assign index number
+	void init_location(ParameterType, MomentType, int, int, bool=true);   // assign location
+	inline LocationType get_location() const;                             // get location
 
 };
 

@@ -14,6 +14,13 @@
 #include "define.h"
 
 
+// typedef returned from computing traveltime and forward
+typedef struct {
+	Eigen::VectorXd time;
+	Eigen::MatrixXd forward;
+} InverseType;
+
+
 // declare a class Table
 class Table
 {
@@ -22,10 +29,12 @@ private:
 	std::vector<Eigen::Vector2d> time;   // travel times
 
 public:
-	Table(Sources, Nodes, Pingers);                           // construct
-	Eigen::VectorXd get_act_time(Sources, Nodes, int, int);   // get nominal time
-	auto get_est_time_forward(Sources, Nodes, int, int);
-	void init_table(Sources, Nodes, Pingers);                 // set up a forward operator
+	Table(Sources, Nodes, Pingers);                        // construct
+	Eigen::MatrixXd get_right_forward(Sources);            // get right-side forward
+	InverseType* get_act_time(Sources, Nodes, int, int);   // get nominal traveltime
+	InverseType* get_est_time_forward(
+		Sources, Nodes, int, int, Eigen::MatrixXd);        // get traveltime and forward
+	void init_table(Sources, Nodes, Pingers);              // set up forward
 
 };
 
