@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
 """
+@author: bjorn.rommel@seisrock.com
 
-Simulating wave propagation through a stack of inclined layers before and after
-a stretch
-
-Date: 1.5.2023
-
-@author: Björn Rommel (rommel@seisrock.com)
 """
 
 
