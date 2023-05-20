@@ -19,7 +19,7 @@ from matplotlib import pyplot as plt
 
 
 # default range of angles for the AVA curves
-DEG = [float(iii) / 1000. for iii in range(0,40001)]
+DEG = [float(iii) / 1000. for iii in range(0, 40001)]
 
 
 # default top properties
@@ -76,6 +76,7 @@ class Fig():
     Generic figure class.
 
     """
+
     def __init__(self, num=None, title=None):
         """
         Initialize a figure.
@@ -146,6 +147,7 @@ class Fig():
                 x = range(0, len(y), 1)
             self.line[key] = plt.plot(x, y, opt)
 
+
 # definition of a figure dict
 fig = dict()
 
@@ -195,6 +197,7 @@ poscon = cp(MODEL)
 
 # parameter in Bayes' theory
 para = {'vsp': np.NAN}   # S-to-P velocity ratio
+para = {'vsp': np.sqrt(3.)}   # S-to-P velocity ratio
 
 
 # suppress traceback
@@ -262,7 +265,7 @@ def exit_plot(env=None):
     None.
 
     """
-    if not env in [CANVASENVIRONMENT, PLOTENVIRONMENT]:
+    if env not in [CANVASENVIRONMENT, PLOTENVIRONMENT]:
         string = 'exit_plot: no environment {}!'.format(env)
         raise AssertionError(string)
     # show plot depending on environment
@@ -427,7 +430,6 @@ def mk_wavelet(name=WAVELETNAME, hwd=WAVELETHALFWIDTH, num=None):
     # plot data
     fig[num].del_line()
     fig[num].plt_line(y=trace, opt=WAVELETCOLOR)
-    #plt.plot(trace, WAVELETCOLOR)
     # adjust abscissa
     plt.xlim(left=1, right=RIGHTWAVELET)
     # adjust ordinate
@@ -765,7 +767,7 @@ def invert_ava(mode=None):
             cov = np.diag([snr] * nos)         # fall back on default
             icov = np.diag([1. / snr] * nos)   # short for inversion
         else:
-            # !!! update to true data covariance!
+            # update to true data covariance!
             cov = np.diag([data['std'] ** 2] * nos)
             icov = np.diag([1. / (data['std'] ** 2)] * nos)
         # return
@@ -906,12 +908,12 @@ def get_input(   # pylint:disable=too-many-arguments
     """
     # compute top model
     get_medium(
-        text = 'top medium: ', halfspace='top',
+        text='top medium: ', halfspace='top',
         vp=vp1, vs=vs1, rho=rho1,
         dvp=dvp1, dvs=dvs1, drho=drho1)
     # compute bottom model
     get_medium(
-        text = 'bottom medium: ', halfspace='bot',
+        text='bottom medium: ', halfspace='bot',
         vp=vp2, vs=vs2, rho=rho2,
         dvp=dvp2, dvs=dvs2, drho=drho2)
     # compute background
@@ -1148,8 +1150,11 @@ def get_medium(text='', halfspace=None, **kwargs):
             if np.isfinite(val):
                 # return True if valid, False if not
                 return (
-                    np.all([valid(prop=prop, val=val)
-                    for valid in validlist[prop]]))
+                    np.all([
+                        valid(prop=prop, val=val)
+                        for valid in validlist[prop]
+                    ])
+                )
         string = 'no valid property {} or value {}'.format(prop, val)
         raise AssertionError(string)   # bang
 
@@ -1343,15 +1348,17 @@ def printout(text=None, vals=None):
     string = f"{'   {:3s} = {{:+12.6f}} +/- {{:+12.6f}}'}\n"*3
     string = string.format(*PROP)
     value = (
-        sum(
-            [[vals['mod'][comp], vals['std'][comp]]
+        sum([
+            [vals['mod'][comp], vals['std'][comp]]
             for comp in [IVP, IVS, IRHO]],
-            []))
+            [
+        ])
+    )
     print(string.format(*value))
     return string.format(*value)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 def do_wvl(
