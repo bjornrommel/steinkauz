@@ -25,16 +25,16 @@ DEG = [float(iii) / 1000. for iii in range(0, 40001)]
 # default top properties
 VP1, DVP1 = 2000, 20
 VS1, DVS1 = 1200, 12
-RHO1, DRHO1 = 2400, 240
+RHO1, DRHO1 = 2400, 100
 
 # default bottom properties
 VP2, DVP2 = 2500, 25
 VS2, DVS2 = 1500, 15
-RHO2, DRHO2 = 2600, 260
+RHO2, DRHO2 = 2600, 100
 
 
 # default signal-to-noise ratio
-SNR = 5   # neutral value
+SNR = 1   # neutral value
 
 
 # parameters for the prior AVA curve
@@ -60,6 +60,15 @@ WAVELETCOLOR = 'b-'                    # Matplotlib line options
 
 
 # --- do not change below --- do not change below --- do not change below ---
+
+
+# modes
+# COEFF: plot prior AVA curve
+# COEFF+: plot prior AVA +/- standard deviation curve
+# DATA: plot data points
+# DATA+: plot data points with data uncertainty bars
+# AVA: plot posterior AVA curve
+# AVA+: plot posterior AVA +/- standard deviation curve
 
 
 # pylint:disable=too-many-lines
@@ -242,7 +251,7 @@ def init_plot(num=None, title=None):
     None.
 
     """
-    # set figure
+    # create figure
     fig[num] = Fig(num=num, title=title)
 
 
@@ -676,7 +685,7 @@ def onclick(event, mode=None, num=None):
                 # plot new AVA curve
                 plot_post_ava(mode=mode, num=num)
                 # compute posterior contrast
-                get_poscon()
+                get_poscon(mode=mode)
         # show curve + data points if any
         exit_plot(env=CANVASENVIRONMENT)
 
@@ -743,7 +752,7 @@ def invert_ava(mode=None):
 
     """
 
-    def create_covariance(nos=None, snr=1):
+    def create_covariance(nos=None, mode=None, snr=SNR):
         """
         Make up a data covariance from a single-valued data standard deviation.
 
@@ -753,6 +762,8 @@ def invert_ava(mode=None):
         ----------
         nos : int
             Number of data points and, hence, dimension of the data covariance.
+        mode : char
+            Operational mode.
         snr : float, optional
             Signal-to-noise ratio. The default is 1, the neutral value.
 
@@ -762,21 +773,30 @@ def invert_ava(mode=None):
             Covariance.
 
         """
-        if np.isnan(data['std']):
-            # fake a covariance if necessary
-            cov = np.diag([snr] * nos)         # fall back on default
-            icov = np.diag([1. / snr] * nos)   # short for inversion
-        else:
-            # update to true data covariance!
-            cov = np.diag([data['std'] ** 2] * nos)
-            icov = np.diag([1. / (data['std'] ** 2)] * nos)
-        # return
-        return cov, icov
+        if '-' in mode:   # conventional
+            # fake a covariance
+            cov = np.diag([1.] * nos)   # fall back on neutral
+            icov = cp(cov)              # short for inversion
+            # return
+            return cov, icov
+        if '+' in mode:   # Bayesian
+            if np.isnan(data['std']):
+                # fake a covariance if necessary
+                cov = np.diag([snr] * nos)         # fall back on default
+                icov = np.diag([1. / snr] * nos)   # short for inversion
+            else:
+                # update to true data covariance!
+                cov = np.diag([data['std'] ** 2] * nos)
+                icov = np.diag([1. / (data['std'] ** 2)] * nos)
+            # return
+            return cov, icov
+        # error
+        sys.exit('programming error in create_covariance!')
 
     # compute reflection matrix
     gmat, _ = comp_gmat(deg=data['deg'])
     # create and invert covariance
-    _, icov = create_covariance(nos=len(data['amp']))
+    _, icov = create_covariance(nos=len(data['amp']), mode=mode)
     # compute posterior covariance
     post['cov'] = (   # initialize with data-controlled part
         np.matmul(
@@ -809,8 +829,9 @@ def invert_ava(mode=None):
         np.dot(post['cov'], amp))
     # print
     if DEBUG:
-        printout(text='posterior model:', vals=post)
-        printout(text='posterior contrast:', vals=poscon)
+        # ### printout(text='posterior model:', vals=post)
+        # ### printout(text='posterior contrast:', vals=poscon)
+        pass
 
 
 def comp_post_ava():
@@ -881,9 +902,14 @@ def get_input(   # pylint:disable=too-many-arguments
         dvp1=np.NAN, dvs1=np.NAN, drho1=np.NAN,
         vp2=np.NAN, vs2=np.NAN, rho2=np.NAN,
         dvp2=np.NAN, dvs2=np.NAN, drho2=np.NAN,
-        snr=np.NAN):
+        snr=np.NAN, mode=None):
     """
     Prepare the input to plotting an AVA curve and invert AVA data.
+
+    Parameters
+    ----------
+    mode : char
+        Operational mode.
 
     Creates
     -------
@@ -917,12 +943,12 @@ def get_input(   # pylint:disable=too-many-arguments
         vp=vp2, vs=vs2, rho=rho2,
         dvp=dvp2, dvs=dvs2, drho=drho2)
     # compute background
-    get_back()
+    get_back(mode=mode)
     # compute prior contrasts
-    get_precon()
+    get_precon(mode=mode)
     # compute the normalized contrasts -> model, in Bayes' theory prior model,
     # and their covariance matrix
-    get_prior()
+    get_prior(mode=mode)
     # collect data STD
     get_data(snr=snr)
     # collect parameters
@@ -1176,7 +1202,7 @@ def get_medium(text='', halfspace=None, **kwargs):
                 np.diag(HALFSPACE[halfspace]['std'] ** 2))
 
 
-def get_back():
+def get_back(mode=None):
     """
     Computes the background medium.
 
@@ -1188,6 +1214,11 @@ def get_back():
         Properties of the top medium.
     bot : dict
         Properties of the bottom medium
+
+    Parameters
+    ----------
+    mode : char
+        Operational mode
 
     Creates
     -------
@@ -1209,10 +1240,11 @@ def get_back():
     back['cov'] = np.diag(back['std'] ** 2)
     # print
     if DEBUG:
-        printout(text='background:', vals=back)
+        if not isinstance(mode, NONETYPE):
+            printout[mode](text='background:', vals=back)
 
 
-def get_precon():
+def get_precon(mode=None):
     """
     Computes the prior contrast.
 
@@ -1224,6 +1256,11 @@ def get_precon():
         Properties of the top medium.
     bot : dict
         Properties of the bottom medium
+
+    Parameters
+    ----------
+    mode : char
+        Operational mode
 
     Creates
     -------
@@ -1245,10 +1282,11 @@ def get_precon():
     precon['cov'] = np.diag(precon['std'] ** 2)
     # print
     if DEBUG:
-        printout(text='prior contrast:', vals=precon)
+        if not isinstance(mode, NONETYPE):
+            printout[mode](text='prior contrast:', vals=precon)
 
 
-def get_prior():
+def get_prior(mode=None):
     """
     Computes the prior.
 
@@ -1263,6 +1301,11 @@ def get_prior():
             Top medium.
         bot : dict
             Bottom medium.
+
+    Parameters
+    ----------
+    mode : char
+        Operational mode
 
     Creates
     -------
@@ -1290,10 +1333,11 @@ def get_prior():
     prior['cov'] = np.diag(prior['std'] ** 2)
     # print
     if DEBUG:
-        printout(text='prior model:', vals=prior)
+        if not isinstance(mode, NONETYPE):
+            printout[mode](text='prior model:', vals=prior)
 
 
-def get_poscon():
+def get_poscon(mode=None):
     """
     Computes the posterior contrast.
 
@@ -1305,6 +1349,11 @@ def get_poscon():
         Background
     post : dict
         Posterior
+
+    Parameters
+    ----------
+    mode : char
+        Operational mode
 
     Creates
     -------
@@ -1327,12 +1376,41 @@ def get_poscon():
     poscon['std'] = back['mod'] * post['std']
     # print
     if DEBUG:
-        printout(text='posterior contrast:', vals=poscon)
+        if not isinstance(mode, NONETYPE):
+            printout[mode](text='posterior contrast:', vals=poscon)
 
 
-def printout(text=None, vals=None):
+def printout1(text=None, vals=None):
     """
-    Print properties.
+    Print properties without standard deviation.
+
+    Parameters
+    ----------
+    text : char
+        Title of printout.
+    vals : dict
+        Property of printout.
+
+    """
+    # print title
+    print(text)
+    # generate format for data output and print
+    string = f"{'   {:3s} = {{:+12.6f}}'}\n"*3
+    string = string.format(*PROP)
+    value = (
+        sum([
+            [vals['mod'][comp]]
+            for comp in [IVP, IVS, IRHO]],
+            [
+        ])
+    )
+    print(string.format(*value))
+    return string.format(*value)
+
+
+def printout2(text=None, vals=None):
+    """
+    Print properties with standard deviation.
 
     Parameters
     ----------
@@ -1356,6 +1434,10 @@ def printout(text=None, vals=None):
     )
     print(string.format(*value))
     return string.format(*value)
+
+
+# define printout options
+printout = {'COEFF-DATA-AVA-': printout1, 'COEFF+DATA+AVA+': printout2}
 
 
 # -----------------------------------------------------------------------------
@@ -1429,7 +1511,7 @@ def do_avadata(mode=None, num=None, title=None):
         dvp1=DVP1, dvs1=DVS1, drho1=DRHO1,
         vp2=VP2, vs2=VS2, rho2=RHO2,
         dvp2=DVP2, dvs2=DVS2, drho2=DRHO2,
-        snr=SNR)
+        snr=SNR, mode=mode)
     # compute AVA curve from prior
     comp_coeff(mode=mode)
     # initialize figure
