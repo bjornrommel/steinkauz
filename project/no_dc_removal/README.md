@@ -6,4 +6,4 @@ Seismic instruments are calibrated by equating their null-line with the mean of 
 
 - [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/bjornrommel/steinkauz/master?filepath=project/no_dc_removal/no_dc_removal.ipynb)
 
-- A [report](https://github.com/bjornrommel/steinkauz/blob/master/project/ambiguity/no_dc_removal/no_dc_removal.pdf) details an example.
+- A [report](https://github.com/bjornrommel/steinkauz/project/ambiguity/no_dc_removal/no_dc_removal.pdf) details an example.
