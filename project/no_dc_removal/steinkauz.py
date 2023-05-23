@@ -16,9 +16,10 @@ or through a TPL file. Principally, there is no limitation on the LaTeX input.
 Docstring:
 ::
 
-  %steinkauz [-o {reference,notebook,printout,setup,clean}] [-i DPI] [-m MAG] [-q PREDIR] [-p PREFILE] [-d TEXDIR]
-                 [-f TEXFILE] [-a] [-n] [-s]
-                 [entries [entries ...]]
+  %steinkauz [-o {reference,notebook,printout,setup,clean}]
+             [-i DPI] [-m MAG] [-q PREDIR] [-p PREFILE] [-d TEXDIR]
+             [-f TEXFILE] [-a] [-n] [-s]
+             [entries [entries ...]]
 
 Define the entry point -- and name -- of the magic.
 
@@ -39,7 +40,8 @@ positional arguments:
   entries               list of placeholders
 
 optional arguments:
-  -o <{reference,notebook,printout,setup,clean}>, --option <{reference,notebook,printout,setup,clean}>
+  -o <{reference,notebook,printout,setup,clean}>,
+  --option <{reference,notebook,printout,setup,clean}>
                         use-for options
   -i DPI, --dpi DPI     DPI of PNG output
   -m MAG, --mag MAG     magnification of PNG output
@@ -54,7 +56,7 @@ optional arguments:
   -a, --assign          return PNG filename
   -n, --noshow          do not show PNG output
   -s, --show            show PNG output
-  
+
 There are options:
     "setup" for setting up a Steinkauz environment
     "notebook" for printing PNG output to screen within the Jupyter
@@ -66,8 +68,8 @@ DPI and MAG specify the DPI and magnification of the PNG output, where higher
 DPI and smaller MAG provide better resolution at higher expense in time and
 disk space
 
-6 Nov 2021
-version 2.1.0
+23 May 2023
+version 2.1.1
 @author: Björn E. Rommel
 """
 
@@ -99,7 +101,6 @@ from PIL import Image as pil   # name collision!
 
 
 # --- change --- change --- change --- change --- change --- change --- change
-
 
 
 # default option for steinkauz (out of 'reference', 'notebook', 'printout')
@@ -202,14 +203,14 @@ FILEDELETE += [
 
 
 # define LaTeX counters for general use
-### LATEXCOUNTER = [
-###    'part', 'chapter', 'section', 'subsection', 'subsubsection', 'paragraph',
-###    'subparagraph','page','equation','figure', 'table', 'footnote',
-###    'mpfootnote', 'enumi', 'enumii', 'enumiii', 'enumiv']
+# ### LATEXCOUNTER = [
+# ###    'part', 'chapter', 'section', 'subsection', 'subsubsection',
+# ###    'paragraph', 'subparagraph','page','equation','figure', 'table',
+# ###    'footnote', 'mpfootnote', 'enumi', 'enumii', 'enumiii', 'enumiv']
 # define LaTeX counters for documentclass article on mybinder.org
 LATEXCOUNTER = [
     'part', 'section', 'subsection', 'subsubsection', 'paragraph',
-    'subparagraph','page','equation','figure', 'table', 'footnote',
+    'subparagraph', 'page', 'equation', 'figure', 'table', 'footnote',
     'mpfootnote', 'enumi', 'enumii', 'enumiii', 'enumiv']
 
 # write out LaTeX counters
@@ -246,7 +247,7 @@ if shutil.which('ps2eps'):
     PS2EPSOPTION = {
         'Linux': ['ps2eps'],
         'Windows': ['perl', shutil.which('ps2eps')],
-        ### 'Windows': ['ps2eps']   # with PS2EPSSHELL = True
+        # ### 'Windows': ['ps2eps']   # with PS2EPSSHELL = True
         }
     # name command as PS2EPSCMD, a list(!)
     PS2EPSCMD = PS2EPSOPTION[PLATFORM]
@@ -264,7 +265,7 @@ else:
 # Windows mostly works either way, but note above PS2EPSSHELL
 SHELL = False            # default
 PS2EPSSHELL = SHELL      # special for ps2eps
-### PS2EPSSHELL = True   # for ps2eps on Windows (if not invoked with perl)
+# ### PS2EPSSHELL = True   # for ps2eps on Windows (if not invoked with perl)
 
 
 # ghostscript switch
@@ -273,11 +274,12 @@ GSCMD = GSOPTION[PLATFORM]
 GSCMD += ['-dSAFER', '-dEPSCrop', '-sDEVICE=pngalpha']
 
 
-# epstool
+# correct bounding box
+# 1. epstool
 EPSCMD = ['epstool', '--copy', '--bbox']
 # !! Note, epstool calls gswin32c; on Windows at least, copy gswin64c and
 # rename it gswin32c !!
-
+# 2. use other software
 
 # debug
 DEBUG = False
@@ -306,9 +308,8 @@ class Steinkauz(Magics):
     excluding, '\\begin{documentclass}[...]{...}' and '\\end{document}'.
     """
 
-
     def __init__(self, shell, project):
-    ### def __init__(self, shell):   # for use without shell imports
+        # ### def __init__(self, shell):   # for use without shell imports
         """
         Initialize the magic.
 
@@ -328,8 +329,8 @@ class Steinkauz(Magics):
         # https://ipython.readthedocs.io/en/stable/config/custommagics.html
         super().__init__(shell)
         # preserve state
-        self.project = cp(project) if project else dict()
-                                          # externally provided LaTeX counters
+        self.project = cp(project) \
+            if project else dict()        # externally provided LaTeX counters
         # initialize other variables
         self.option = cp(OPTION)          # process options, see above
         self.dpi = str(DPI)               # DPI resolution (str!)
@@ -346,7 +347,6 @@ class Steinkauz(Magics):
         self.png = None                   # png output
         self.assign = False               # assign PNG filename to variable
         self.show = True                  # display PNG graphics
-
 
     # pylint: disable=inconsistent-return-statements   # return only if asked
     @magic_arguments()
@@ -365,7 +365,7 @@ class Steinkauz(Magics):
         default=cp(FOLDER))
     @argument(
         '-p', '--prefile', type=str, help='file with user preamble',
-        default=None)   
+        default=None)
     @argument(
         '-d', '--texdir', type=str,
         help='directory containing file with LaTeX fragment',
@@ -434,13 +434,10 @@ class Steinkauz(Magics):
             return pngfile
         return None
 
-
 # -----------------------------------------------------------------------------
-
 
     # pylint: disable=no-self-use       # consistent notation for all ...
     # pylint: disable=unused-argument   # ... proc_<xxx>
-
 
     def proc_args(self, args=None):
         """
@@ -478,7 +475,6 @@ class Steinkauz(Magics):
         # extract placeholders
         self.entries = cp(args.entries)
 
-
     def proc_count(self):
         """
         Extract LaTeX counter assignments.
@@ -511,7 +507,6 @@ class Steinkauz(Magics):
                         # remove from entries list
                         self.entries.remove(entry)
 
-
     def proc_cell(self, line=None, cell=None):
         """
         Convert LaTeX line fragment into cell fragment.
@@ -538,7 +533,7 @@ class Steinkauz(Magics):
             # split along r""" and """
             temp = None
             if 'r"""' in line:
-                temp = line.replace('r"""','"""').split('"""')
+                temp = line.replace('r"""', '"""').split('"""')
             # extract fragment between r""" and either """ or end of line
             if temp:
                 if len(temp) >= 2:       # at least one """ present
@@ -550,7 +545,6 @@ class Steinkauz(Magics):
                     cell = fragment + cell if cell else fragment
         # return fragment
         return line, cell
-
 
     def proc_status(self, cell=None):
         """
@@ -585,9 +579,7 @@ class Steinkauz(Magics):
         # otherwise, return False
         return False
 
-
 # -----------------------------------------------------------------------------
-
 
     def proc_cmd_setup(self, cell=None):
         """
@@ -628,7 +620,6 @@ class Steinkauz(Magics):
         with open(TEMPLATEFILE, 'w') as file:
             file.write(template)
 
-
     def proc_cmd_notebook(self, cell=None):
         """
         Process the entire steinkauz stack of commands for notebook.
@@ -667,7 +658,6 @@ class Steinkauz(Magics):
         # return
         return pngfile
 
-
     def proc_cmd_printout(self, cell=None):   # pylint:disable=unused-argument
         """
         Process the entire steinkauz stack of commands for option 'printout'.
@@ -688,7 +678,6 @@ class Steinkauz(Magics):
         self.make_ps()
         # convert ps format with ps2pdf into pdf format
         self.make_pdf()
-
 
     def proc_cmd_clean(self, cell=None):   # pylint:disable=unused-argument
         """
@@ -762,9 +751,7 @@ class Steinkauz(Magics):
         for folder in FOLDERDELETE:
             cleanfolder(folder)
 
-
 # -----------------------------------------------------------------------------
-
 
     def make_incnt(self):
         """
@@ -795,7 +782,6 @@ class Steinkauz(Magics):
             if string:
                 file.write(string)
 
-
     def make_outcnt(self):
         """
         Create a file returning the current LaTeX counters after execution.
@@ -817,7 +803,6 @@ class Steinkauz(Magics):
             for counter in LATEXCOUNTER:
                 string += LATEXOUTSTRING.format(placecounter=counter)
             file.write(string)
-
 
     def prep_tpl(self, cell=None):
         """
@@ -879,7 +864,6 @@ class Steinkauz(Magics):
             self.get_tpl()
             self.fragment = clean_cell(self.fragment)
 
-
     def get_tpl(self):
         """
         Read the LaTeX fragment from a TPL file.
@@ -902,7 +886,6 @@ class Steinkauz(Magics):
             string += "texfile: {}\n".format(self.texfile)
             print(string)
             raise UserWarning(msg) from msg
-
 
     def put_tpl(self):
         """
@@ -928,7 +911,6 @@ class Steinkauz(Magics):
             string += "texfile: {}\n".format(self.texfile)
             print(string)
             raise UserWarning(msg) from msg
-
 
     def make_doc(self):
         """
@@ -965,7 +947,6 @@ class Steinkauz(Magics):
                     inn = file.read()
                     self.doc = self.doc.replace(entry, inn)
 
-
     def make_tex(self):
         """
         Write out a TeX file.
@@ -984,7 +965,6 @@ class Steinkauz(Magics):
             raise UserWarning(string)
         with open(texfile, 'w') as file:
             file.write(self.doc)
-
 
     def make_dvi(self):
         """
@@ -1005,26 +985,27 @@ class Steinkauz(Magics):
         # \documentclass has been processed. That is, a macro jupyter
         # containing setcounter definitions is passed in via STDIN, but
         # executed later by calling the macro \jupyter in the LaTeX doc.
-        ### counters = [
-        ###    r'\setcounter{' + counter + r'}{' + str(self.project[str(counter)])
-        ###    + r'}'
-        ###    for counter in LATEXCOUNTER]
-        ### counters = counters[0:-1]
-        ### stdin = r'\def\jupyter{'
-        ### for counter in LATEXCOUNTER:
-        ###    stdin += (
-        ###        r'\setcounter{' + counter + r'}{' +
-        ###        str(self.project[str(counter)]) + r'}')
-        ### stdin += r'}'
+        # ### counters = [
+        # ###    r'\setcounter{' + counter + r'}
+        # ###                 {' + str(self.project[str(counter)])
+        # ###    + r'}'
+        # ###    for counter in LATEXCOUNTER]
+        # ### counters = counters[0:-1]
+        # ### stdin = r'\def\jupyter{'
+        # ### for counter in LATEXCOUNTER:
+        # ###    stdin += (
+        # ###        r'\setcounter{' + counter + r'}{' +
+        # ###        str(self.project[str(counter)]) + r'}')
+        # ### stdin += r'}'
         cmd = ['latex']
-        ### cmd += [stdin]
+        # ### cmd += [stdin]
         cmd += [r'-output-directory=' + dvidir, r'\input{' + texfile + r'}']
         self.run_cmd(cmd, shell=SHELL)
-        ### cmd = [
-        ###    'latex', '-interaction=batchmode', '-output-directory=' + dvidir,
-        ###    texfile]
+        # ### cmd = [
+        # ###    'latex', '-interaction=batchmode',
+        # ###    '-output-directory=' + dvidir,
+        # ###    texfile]
         self.run_cmd(cmd, shell=SHELL)
-
 
     def make_ps(self):
         """
@@ -1041,7 +1022,6 @@ class Steinkauz(Magics):
         cmd = ['dvips', dvifile]
         self.run_cmd(cmd, shell=SHELL)
 
-
     def make_pdf(self):
         """
         Create a PDF formatted file from a PS file.
@@ -1057,7 +1037,6 @@ class Steinkauz(Magics):
         # run dvips generating a ps file
         cmd = ['ps2pdf', psfile, pdffile]
         self.run_cmd(cmd, shell=SHELL)
-
 
     def make_epxx(self):
         """
@@ -1085,7 +1064,6 @@ class Steinkauz(Magics):
             string = string.format(PS2EPSFLAG)
             raise UserWarning(string)
 
-
     def make_eps(self):
         """
         Create a EPS-formatted file from a ps file.
@@ -1109,7 +1087,6 @@ class Steinkauz(Magics):
         # correct bounding box and thereby copy .eps.eps back to .eps
         cmd = list(EPSCMD) + [epsepsfile, epsfile]
         self.run_cmd(cmd, shell=SHELL)
-
 
     def make_epi(self):
         """
@@ -1135,7 +1112,6 @@ class Steinkauz(Magics):
         cmd = list(EPSCMD) + [epifile, epsfile]
         self.run_cmd(cmd, shell=SHELL)
 
-
     def make_png(self):
         """
         Create a PNG64-formatted file from an eps or epi file.
@@ -1154,15 +1130,15 @@ class Steinkauz(Magics):
             os.path.join(FOLDER, self.texdir, self.texfile+'.png64'))
         pngfile = os.path.join(FOLDER, self.texdir, self.texfile+'.png')
         # convert eps to png
-        ### cmd = [
-        ###     'magick', '-density', self.dpi, '-quality', '100',
-        ###     epsfile, png64file]
+        # ### cmd = [
+        # ###     'magick', '-density', self.dpi, '-quality', '100',
+        # ###     epsfile, png64file]
         # magick is not installed on mybinder; so, use convert
         # convert is blocked due to an old security vulnerability
         # https://stackoverflow.com/questions/42928765/convertnot-authorized-aaaa-error-constitute-c-readimage-453
-        ### cmd = [
-        ###     'convert', '-density', self.dpi, '-quality', '100',
-        ###     epsfile, png64file]
+        # ### cmd = [
+        # ###     'convert', '-density', self.dpi, '-quality', '100',
+        # ###     epsfile, png64file]
         # so, use ghostscript directly
         res = '-r' + self.dpi
         # https://stackoverflow.com/a/60238216/6056880
@@ -1177,7 +1153,6 @@ class Steinkauz(Magics):
             (int(round(self.mag*width)), int(round(self.mag*height))))
         # save as PNG, not PNG64
         png.save(pngfile)
-
 
     def show_png(self):
         """
@@ -1205,9 +1180,7 @@ class Steinkauz(Magics):
         # return
         return pngfile
 
-
 # -----------------------------------------------------------------------------
-
 
     def run_cmd(   # pylint:disable=too-many-arguments
             self, cmd=None, shell=SHELL, capture_output=True, text=True,
@@ -1287,7 +1260,6 @@ class Steinkauz(Magics):
             string += "stderr: {}".format(proc.stderr)
             raise UserWarning(string)
 
-
     def fullname(self, folder=None, file=None, tex=False):
         """
         Create a fully qualified filename.
@@ -1316,7 +1288,6 @@ class Steinkauz(Magics):
             file = file.replace('\\', '/')   # Windows <-> TeX quirk
         # return
         return file
-
 
     def fulldir(self, folder=None, tex=False):
         """
@@ -1357,9 +1328,7 @@ class Steinkauz(Magics):
         # return
         return folder
 
-
 # -----------------------------------------------------------------------------
-
 
     @line_magic
     def inputtoggle(self, line=None, text="Toggle Jupyter input on/off"):  # pylint:disable=unused-argument
@@ -1455,5 +1424,5 @@ def load_ipython_extension(ipython):
     # since its constructor has different arguments from the default:
     # (https://ipython.readthedocs.io/en/stable/config/custommagics.html)
     magics = Steinkauz(ipython, project)
-    ### magics = Steinkauz(ipython)   # without locally provided project
+    # ### magics = Steinkauz(ipython)   # without locally provided project
     ipython.register_magics(magics)
