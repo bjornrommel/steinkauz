@@ -2,7 +2,7 @@
 """
 Python code for the "avo_for_density" Notebook.
 
-@author: Björn E. Rommel, version: 1.0.0
+@author: Björn E. Rommel, version: 2.0.0
 """
 
 
@@ -34,7 +34,7 @@ RHO2, DRHO2 = 2600, 100
 
 
 # default signal-to-noise ratio
-SNR = 1   # neutral value
+SNR = 3   # some reasonable value
 
 
 # parameters for the prior AVA curve
