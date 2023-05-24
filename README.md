@@ -23,7 +23,7 @@ Often, density is said to be unobtainable by AVO inversion. However, a Bayesian-
 Seismic instruments are calibrated by equating their null-line with the mean of a very large noise dataset. Nonetheless, individual seismic records, which are small in size, will show means fluctuating around the null-line. 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/bjornrommel/steinkauz/master?filepath=project/no_dc_removal/no_dc_removal.ipynb)
 
-- Tutorial:
+- Tutorial(https://github.com/bjornrommel/steinkauz/tree/master/project/tutorial):
 The IPython extension steinkauz provides a line / cell magic rendering all LaTeX  input both on screen as well as in print.
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/bjornrommel/steinkauz/HEAD?filepath=project%2Ftutorial%2Ftutorial.ipynb)
 
