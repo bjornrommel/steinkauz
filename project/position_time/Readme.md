@@ -1,5 +1,9 @@
 # Positioning and Timing of Nodes
 
+Deploying nodes is not perfect: nodes are usually slightly mis-positioned. Furthermore, the clocks used in nodes tend to drift over time. Using source location, all available first breaks and later pinger time signals, however, the position of nodes and their time drifts can be determined.
+
+[Source and Receive Positioning](SubsurfaceModel.png?raw=true) shows the source and receiver points in red and green, respectively, and before and after re-positioning as open and filled circles, respectively. Since the source positioning is very accurate to begin with, source points are virtually unchanged.
+
 ## Installation
 
 The software is written in C++ according to the ISO C++20 Standard, with the graphics written in Python 3. So, obviously, it requires a working C++ and [Python 3](https://www.python.org) environment. Furthermore, it specifically requires the [Eigen directory](https://eigen.tuxfamily.org) as well as the [matplotlib](https://matplotlib.org/) and [pybind11](https://github.com/pybind/pybind11) modules. And it is tested with VisualStudio 2022 only; however, do not use "debug" mode with VisualStudio: pybind11 calling matplotlib fails when closing the interpreter.
