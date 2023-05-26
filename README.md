@@ -8,7 +8,7 @@ Projekt Steinkauz: a series of notebooks on various topics of seismic data proce
 - [Subsurface-Traveltime Ambiguity](https://github.com/bjornrommel/steinkauz/tree/master/project/ambiguity):
 Modifying the subsurface, and the velocity of a seismic wave travelling through the subsurface, in some specific way changes the traveltime of that wave very little. Here, a Python software simulates the propagation of two waves, the original and a modified one, and displays their wavefronts. A [paper](https://github.com/bjornrommel/steinkauz/tree/master/project/ambiguity/BjörnRommel.WeaklyAnellipticalTraveltimeAnalysis.pdf) "Weakly-Anelliptical Traveltime Analysis: Ambiguity between Subsurface and Elasticity" is under review with Geophysics. The corresponding [software](https://github.com/bjornrommel/steinkauz/tree/master/project/ambiguity/ambiguity-as_used_for_manuscript.py) written in Python is also available.
 
-## C++
+## Positioning and Timing of Nodes / C++
 
 - [Positioning and Timing of Nodes](https://github.com/bjornrommel/steinkauz/tree/master/project/position_time)
 Deploying nodes is not perfect: nodes are usually slightly mis-positioned. Furthermore, the clocks used in nodes tend to drift over time. Using source location, all available first breaks and later pinger time signals, however, the position of nodes and their time drifts can be determined.  
