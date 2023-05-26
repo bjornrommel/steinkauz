@@ -2,7 +2,7 @@
 
 Deploying nodes is not perfect: nodes are usually slightly mis-positioned. Furthermore, the clocks used in nodes tend to drift over time. Using source location, all available first breaks and later pinger time signals, however, the position of nodes and their time drifts can be determined.
 
-![Source and Receive Positioning](SubsurfaceModel.png?raw=true) shows the source and receiver points in red and green, respectively, and before and after re-positioning as open and filled circles, respectively. Since the source positioning is very accurate to begin with, source points are virtually unchanged.
+![Source and Receive Positioning](source-node_layout.png?raw=true) shows the source and receiver points in red and green, respectively, and before and after re-positioning as open and filled circles, respectively. Since the source positioning is very accurate to begin with, source points are virtually unchanged.
 
 ## Installation
 
