@@ -4,6 +4,7 @@
 
 // include headers
 #include <iostream>
+#include <list>  
 #include "config.h"
 #include "define.h"
 #include "source.h"

@@ -6,8 +6,8 @@
 
 // include headers
 #include <string>
-#include <pybind11/embed.h>  // py::scoped_interpreter
-#include <pybind11/stl.h>    // bindings from C++ STL containers to Python types
+#include "embed.h"  // py::scoped_interpreter
+#include "stl.h"   // bindings from C++ STL containers to Python types
 #include "define.h"
 #include "source.h"
 #include "node.h"
@@ -49,6 +49,7 @@ void Graphics::open() {
 
 	// open Python interpreter
 	py::initialize_interpreter();
+	//py::scoped_interpreter guard{};   // alternative to initialize_interpreter
 
 };
 
