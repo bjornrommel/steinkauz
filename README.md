@@ -13,7 +13,7 @@ Modifying the subsurface, and the velocity of a seismic wave travelling through 
 - [Positioning and Timing of Nodes](https://github.com/bjornrommel/steinkauz/tree/master/project/position_time)
 Deploying nodes is not perfect: nodes are usually slightly mis-positioned. Furthermore, the clocks used in nodes tend to drift over time. Using source location, all available first breaks and later pinger time signals, however, the position of nodes and their time drifts can be determined.  
 
-## Notebooks
+## Notebooks / Jupyter
 
 - [AVO for Density](https://github.com/bjornrommel/steinkauz/tree/master/project/avo_for_density):
 Often, density is said to be unobtainable by AVO inversion. However, a Bayesian-style AVO inversion based on a prior model, seismic data and a best estimate of their respective uncertainties is robust. It will invert for density, too, and its posterior uncertainty will be smaller. Also, from a philosophical point of view, we make optimal use of all available information.
@@ -32,7 +32,7 @@ The IPython extension steinkauz provides a line / cell magic rendering all LaTeX
 - [Time Drift Calibration:](https://github.com/bjornrommel/steinkauz/tree/master/project/time_drift_calibration)
 Calibrate a time drift of a node during its deployment (in-situ). 
 
-## Module Steinkauz  
+## Module Steinkauz / LaTeX extension for Jupyter
 
 - [Download Steinkauz:](https://github.com/bjornrommel/steinkauz/tree/master/project/download_steinkauz)
 steinkauz.py is an iPython line/cell magics extension. It converts a LaTeX fragment, which it gets from a file or reads in from the notebook itself, into a PNG image. This PNG file will then be displayed inside the notebook. Key point being, that fragment can be updated in line with the results of computations made in that notebook. For details see the tutorial, and download the source file, all in their respectively named directories.

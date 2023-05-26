@@ -70,7 +70,7 @@ disk space
 
 23 May 2023
 version 2.1.1
-@author: BjÃ¶rn E. Rommel
+@author: Björn E. Rommel
 """
 
 
