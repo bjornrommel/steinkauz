@@ -27,7 +27,7 @@ Seismic instruments are calibrated by equating their null-line with the mean of 
 The IPython extension steinkauz provides a line / cell magic rendering all LaTeX  input both on screen as well as in print.
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/bjornrommel/steinkauz/HEAD?filepath=project%2Ftutorial%2Ftutorial.ipynb)
 
-## Patent
+## Patent / Law
 
 - [Time Drift Calibration:](https://github.com/bjornrommel/steinkauz/tree/master/project/time_drift_calibration)
 Calibrate a time drift of a node during its deployment (in-situ). 
@@ -37,7 +37,7 @@ Calibrate a time drift of a node during its deployment (in-situ).
 - [Download Steinkauz:](https://github.com/bjornrommel/steinkauz/tree/master/project/download_steinkauz)
 steinkauz.py is an iPython line/cell magics extension. It converts a LaTeX fragment, which it gets from a file or reads in from the notebook itself, into a PNG image. This PNG file will then be displayed inside the notebook. Key point being, that fragment can be updated in line with the results of computations made in that notebook. For details see the tutorial, and download the source file, all in their respectively named directories.
 
-## Technical Marketing
+## Blended Acquisition / Technical Marketing
 - [Multiple Sources:](https://github.com/bjornrommel/steinkauz/tree/master/project/blended_acquisition)
 An illustrative, but very technical introduction into the subject of blended acquisition including triple and penta sources.
 
