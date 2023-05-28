@@ -34,7 +34,7 @@ Calibrate a time drift of a node during its deployment (in-situ).
 
 ## Module Steinkauz / LaTeX extension for Jupyter
 
-- [Download Steinkauz:](https://github.com/bjornrommel/steinkauz/tree/master/project/tutorial)
+- [Download Steinkauz:](https://github.com/bjornrommel/steinkauz/tree/master/project/steinkauz)
 steinkauz.py is an iPython line/cell magics extension. It converts a LaTeX fragment, which it gets from a file or reads in from the notebook itself, into a PNG image. This PNG file will then be displayed inside the notebook. Key point being, that fragment can be updated in line with the results of computations made in that notebook. For details see the tutorial, and download the source file, all in their respectively named directories.
 
 ## Blended Acquisition / Technical Marketing
@@ -53,6 +53,6 @@ You can use the module and notebooks, but, please, give credit where credit is d
 
 ## Acknowledgements  
 
-The module steinkauz has been inspired by Dan MacKinlay's latex_fragment (https://github.com/danmackinlay/latex_fragment)  
+The Jupyter magic steinkauz has been inspired by Dan MacKinlay's latex_fragment (https://github.com/danmackinlay/latex_fragment)  
 And, then, there are all the contributors to Jupyter Notebook!
 

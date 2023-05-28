@@ -12,4 +12,4 @@ The IPython extension steinkauz provides a line / cell magic rendering all LaTeX
 
 - [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/bjornrommel/steinkauz/master?filepath=project/tutorial/tutorial.ipynb)
 
-Note, steinkauz is both the name of the entire project as well as of the software just described.
+Note, steinkauz is both the name of the entire repository as well as of the software just described.
