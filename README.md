@@ -25,7 +25,7 @@ Seismic instruments are calibrated by equating their null-line with the mean of 
 
 - [Steinkauz Tutorial](https://github.com/bjornrommel/steinkauz/tree/master/project/steinkauz):
 The Jupyter module steinkauz provides a line / cell magic rendering all LaTeX input.
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/bjornrommel/steinkauz/HEAD?filepath=project%2Fsteinkauz%2Ftutorial.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/bjornrommel/steinkauz/master?labpath=project%2Fsteinkauz%2Ftutorial.ipynb)
 
 ## Patent / Law
 
