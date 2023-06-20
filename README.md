@@ -3,9 +3,9 @@
 Projekt Steinkauz: a series of notebooks on various topics of seismic data processing.
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/bjornrommel/steinkauz/master)  
 
-## Subsurface-Traveltime Ambiguity / Python
+## Subsurface-Velocity Ambiguity / Python
 
-- [Subsurface-Traveltime Ambiguity](https://github.com/bjornrommel/steinkauz/tree/master/project/ambiguity):
+- [Subsurface-Velocity Ambiguity](https://github.com/bjornrommel/steinkauz/tree/master/project/ambiguity):
 Modifying the subsurface, and the velocity of a seismic wave travelling through the subsurface, in some specific way changes the traveltime of that wave very little. Here, a Python software simulates the propagation of two waves, the original and a modified one, and displays their wavefronts. A [paper](https://github.com/bjornrommel/steinkauz/tree/master/project/ambiguity/BjörnRommel.WeaklyAnellipticalTraveltimeAnalysis.pdf) "Weakly-Anelliptical Traveltime Analysis: Ambiguity between Subsurface and Elasticity" is under review with Geophysics. The corresponding [software](https://github.com/bjornrommel/steinkauz/tree/master/project/ambiguity/ambiguity-as_used_for_manuscript.py) written in Python is also available.
 
 ## Positioning and Timing of Nodes / C++
@@ -23,7 +23,7 @@ Often, density is said to be unobtainable by AVO inversion. However, a Bayesian-
 Seismic instruments are calibrated by equating their null-line with the mean of a very large noise dataset. Nonetheless, individual seismic records, which are small in size, will show means fluctuating around the null-line. 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/bjornrommel/steinkauz/master?filepath=project/no_dc_removal/no_dc_removal.ipynb)
 
-- [Steinkauz Tutorial](https://github.com/bjornrommel/steinkauz/tree/master/project/steinkauz):
+- [Steinkauz](https://github.com/bjornrommel/steinkauz/tree/master/project/steinkauz):
 The Jupyter module steinkauz provides a line / cell magic rendering all LaTeX input.
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/bjornrommel/steinkauz/master?labpath=project%2Fsteinkauz%2Ftutorial.ipynb)
 

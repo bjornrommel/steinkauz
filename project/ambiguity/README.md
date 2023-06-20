@@ -1,6 +1,6 @@
 # Steinkauz
 
-## Subsurface-Traveltime Ambiguity
+## Subsurface-Velocity Ambiguity
 
 Traveltime analysis over an anisotropic subsurface is inherently ambiguous. I can modify the subsurface and the   (linearized) velocity of a seismic wave travelling through that subsurface, in some specific way, yet the traveltimes observed at the surface show only "small" changes.  
 ![two different subsurface-wavefronts models](SubsurfaceModel.png?raw=true)
