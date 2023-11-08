@@ -125,7 +125,7 @@ class Fig():
         # loop through lines
         for line in ['amp', 'amp+std', 'amp-std', 'other']:
             # check key in dict
-            if line in self.line.keys():
+            if line in self.line:
                 # protect against None
                 if self.line[line]:
                     # remove
@@ -158,7 +158,7 @@ class Fig():
 
 
 # definition of a figure dict
-fig = dict()
+fig = dict()   # pylint:disable=use-dict-literal
 
 
 # initialize AVA points
@@ -275,7 +275,7 @@ def exit_plot(env=None):
 
     """
     if env not in [CANVASENVIRONMENT, PLOTENVIRONMENT]:
-        string = 'exit_plot: no environment {}!'.format(env)
+        string = f'exit_plot: no environment {env}!'
         raise AssertionError(string)
     # show plot depending on environment
     if env == CANVASENVIRONMENT:
@@ -422,7 +422,7 @@ def mk_wavelet(name=WAVELETNAME, hwd=WAVELETHALFWIDTH, num=None):
     try:
         eval(WAVELETS[name])   # pylint:disable=eval-used
     except KeyError as msg:
-        string = "mk_wavelet: cannot find wavelet {}".format(name)
+        string = f'mk_wavelet: cannot find wavelet {name}'
         print(string)
         raise AssertionError(msg) from msg
     # set wavelet indices
@@ -543,7 +543,7 @@ def comp_gmat(deg=DEG):
     """
     # sanity check
     if not np.isfinite(para['vsp']):
-        string = 'no S-to-P velocity ratio {}'.format(para['vsp'])
+        string = f"no S-to-P velocity ratio {para['vsp']}"
         raise AssertionError(string)
     # convert angle from degree to radiant
     rad = np.deg2rad(deg)
@@ -590,7 +590,7 @@ def comp_coeff(mode=None):
     if 'COEFF' in mode:
         # check sanity
         if not np.all(np.isfinite(prior['mod'])):
-            string = 'comp_coeff: no prior model {}!'.format(prior['mod'])
+            string = f"comp_coeff: no prior model {prior['mod']}!"
             raise AssertionError(string)
         # get reflection matrix
         gmat, gmat2 = comp_gmat()
@@ -1054,7 +1054,7 @@ def get_medium(text='', halfspace=None, **kwargs):
             if isinstance(bol, np.bool_):
                 # return 1 if true, 0 if not
                 return 1 if bol else 0
-        raise AssertionError('invalid boolean {}!'.format(bol))   # bang
+        raise AssertionError(f'invalid boolean {bol}!')   # bang
 
     def valid0(prop='vp', val=np.NAN):
         """
@@ -1181,7 +1181,7 @@ def get_medium(text='', halfspace=None, **kwargs):
                         for valid in validlist[prop]
                     ])
                 )
-        string = 'no valid property {} or value {}'.format(prop, val)
+        string = f'no valid property {prop} or value {val}'
         raise AssertionError(string)   # bang
 
     # list of properties = keys
@@ -1275,7 +1275,7 @@ def get_precon(mode=None):
 
     """
     # compute the prior contrast
-    precon['mod'] = (bot['mod'] - top['mod'])
+    precon['mod'] = bot['mod'] - top['mod']
     # compute the prior contrast STD
     precon['std'] = np.sqrt(top['std'] ** 2 + bot['std'] ** 2)
     # compute the prior contrast covariance
