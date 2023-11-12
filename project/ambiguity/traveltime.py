@@ -5,6 +5,8 @@ Computing traveltimes in a homogeneous medium for a 3-term phase velocity.
 
 @author: Björn Rommel
 @email: rommel@seisrock.com
+@version: 1.0.0
+@date: 12.11.2023
 """
 
 
