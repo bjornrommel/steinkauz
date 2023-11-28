@@ -6,5 +6,5 @@ Traveltime analysis over an anisotropic subsurface is inherently ambiguous. I ca
 ![two different subsurface-wavefronts models](SubsurfaceModel.png?raw=true)
 - A [paper](https://github.com/bjornrommel/steinkauz/tree/master/project/ambiguity/BjörnRommel.WeaklyAnellipticalTraveltimeAnalysis.pdf) "Weakly-Anelliptical Traveltime Analysis: Ambiguity between Subsurface and Elasticity" is under review with Geophysics. 
 - A [Python software](https://github.com/bjornrommel/steinkauz/blob/master/project/ambiguity/ambiguity-as_used_for_manuscript.py) simulates the propagation of two waves, the original and a modified one, and displays their wavefronts. 
-- Another [Python software](https://github.com/bjornrommel/steinkauz/blob/master/project/ambiguity/traveltime.py) computes traveltimes of a wave propagating in a homogeneous medium, as used, for example, in ray tracing.
+- Another [Python software](https://github.com/bjornrommel/steinkauz/blob/master/project/ambiguity/ttwean.1-0-0.py) computes traveltimes of a wave propagating in a homogeneous medium, as used, for example, in ray tracing.
 
