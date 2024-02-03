@@ -1,12 +1,26 @@
 ttwean: Velocity-versus-Structure for Reflection Seismics!
 
-ttwean is a collection of function used to investigate "stretch", a method to generate a series of velocity-structure models all of which (approximately) satisfy the same traveltime curve. The subset ttwean_for_ttcpry is designed specifically for use with ttcpry, a software for ray-tracing simulation https://ttcrpy.readthedocs.io/en/latest/ of wavefield propagation by Berard Giroux https://inrs.ca/en/research/professors/bernard-giroux/. The software repository is https://github.com/groupeLIAMG/ttcr.
+ttwean is a collection of function used to investigate "stretch", a method to
+generate a series of velocity-structure models all of which (approximately) 
+satisfy the same traveltime curve. The subset ttwean_for_ttcpry is designed 
+specifically for use with ttcpry, a software for ray-tracing simulation 
+https://ttcrpy.readthedocs.io/en/latest/ of wavefield propagation by Berard 
+Giroux https://inrs.ca/en/research/professors/bernard-giroux/. The software 
+repository is https://github.com/groupeLIAMG/ttcr.
 
-The file ttwean_for_ttcpry.py contains the function ttinit and ttvel wrapped into a class TTWean. However, you can safely rip out the functions ttinit and ttvel from underneath the class TTWean and use them independently outside any package.
+The file ttwean_for_ttcpry.py contains the function ttinit and ttvel wrapped 
+into a class TTWean. However, you can safely rip out the functions ttinit and 
+ttvel from underneath the class TTWean and use them independently outside any 
+package.
 
-Note, due to some misunderstanding of ttcrpy on my side, there is a conflict of notation: the parameter r in ttcpry, see the example 5, https://github.com/groupeLIAMG/ttcr/blob/master/examples/example5.ipynb, ought to be the linear energy-velocity parameter s of my paper; the latter is computed here and must be used in place of the parameter r in ttcpry!
+Note, due to some misunderstanding of ttcrpy on my side, there is a conflict 
+of notation: the parameter r in ttcpry, see the example 5, 
+https://github.com/groupeLIAMG/ttcr/blob/master/examples/example5.ipynb, ought
+to be the linear energy-velocity parameter s of my paper; the latter is 
+computed here and must be used in place of the parameter r in ttcpry!
 
-My software repository is https://github.com/bjornrommel/steinkauz under the project Subsurface-Velocity Ambiguity.
+My software repository is https://github.com/bjornrommel/steinkauz under the 
+project Subsurface-Velocity Ambiguity.
 
 @author: Björn E. Rommel
 @email: ttwean@seisrock.com
