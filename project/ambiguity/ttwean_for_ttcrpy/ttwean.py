@@ -11,9 +11,9 @@ simulation https://ttcrpy.readthedocs.io/en/latest/ of wavefield propagation
 by Berard Giroux https://inrs.ca/en/research/professors/bernard-giroux/
 The software repository is https://github.com/groupeLIAMG/ttcr
 
-You can use the functions ttinit and ttvel as part of the entire ttwean 
-package, which can be installed via pip ttwean...whl. However, for use 
-specifically with ttcrpy only you can safely rip out the functions ttinit and 
+You can use the functions ttinit and ttvel as part of the entire ttwean
+package, which can be installed via pip ttwean...whl. However, for use
+specifically with ttcrpy only you can safely rip out the functions ttinit and
 ttvel below and use them independently outside that package.
 
 Note, due to some misunderstanding of ttcrpy on my side, there is a conflict of
@@ -70,8 +70,8 @@ class TTWean():
     # set the energy-velocity parameters
     @staticmethod
     def ttinit(
-            vp0:float=None, vs0:float=None, delta:float=None,
-            epsilon:float=None, wavetype:str=None, ggg:float=None) -> np.array:
+            vp0:float=None, vs0:float=None, delta:float=0.,
+            epsilon:float=0., wavetype:str="P", ggg:float=0.) -> np.array:
         """
         Precompute the linear energy-velocity parameters once.
 
@@ -164,8 +164,9 @@ class TTWean():
     # compute energy velocity
     @staticmethod
     def ttvel(
-            vp0:float=None, vs0:float=None, sss:np.array=None,
-            wavetype:str=None, angle:float=None) -> float:
+            vp0:float=None, vs0:float=None,
+            sss:np.array=np.array([[1.],[np.nan],[0.],[np.nan],[0]]),
+            wavetype:str="P", angle:float=None) -> float:
         """
         Compute a linear energy velocity for a given directional angle.
 
@@ -199,7 +200,8 @@ class TTWean():
         vs0 : float
             reference S-velocity
         sss : np.array ([5x1])
-            linear energy-velocity parameters
+            linear energy-velocity parameters, default to isotropy
+            note, s0=1 set, s2 and s4 in use, s1 and s3 nan
         wavetype : char
             "P" : P-wave
             "SV" : S-wave
@@ -244,7 +246,7 @@ def main():
     # medium, wavetype or incidence angle
     vel = (
         TTWean.ttvel(
-            vp0=vp0, vs0=vs0, sss=sss, wavetype=WAVETYPE,
+            vp0=vp0, vs0=vs0,# sss=sss, wavetype=WAVETYPE,
             angle=np.deg2rad(ANGLE)))
     # print output
     text = f"{TITLE}\n"                        # title
