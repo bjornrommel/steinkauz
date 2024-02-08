@@ -13,16 +13,10 @@ into a class TTWean. However, you can safely rip out the functions ttinit and
 ttvel from underneath the class TTWean and use them independently outside any 
 package.
 
-Note, due to some misunderstanding of ttcrpy on my side, there is a conflict 
-of notation: the parameter r in ttcpry, see the example 5, 
-https://github.com/groupeLIAMG/ttcr/blob/master/examples/example5.ipynb, ought
-to be the linear energy-velocity parameter s of my paper; the latter is 
-computed here and must be used in place of the parameter r in ttcpry!
-
 My software repository is https://github.com/bjornrommel/steinkauz under the 
 project Subsurface-Velocity Ambiguity.
 
 @author: Björn E. Rommel
 @email: ttwean@seisrock.com
-@version: 3.1.0
-@date: 2024-02-03
+@version: 3.0.3
+@date: 2024-02-08

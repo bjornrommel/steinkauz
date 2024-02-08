@@ -16,19 +16,13 @@ package, which can be installed via pip ttwean...whl. However, for use
 specifically with ttcrpy only you can safely rip out the functions ttinit and
 ttvel below and use them independently outside that package.
 
-Note, due to some misunderstanding of ttcrpy on my side, there is a conflict of
-notation: the parameter r in ttcpry, see the example 5,
-https://github.com/groupeLIAMG/ttcr/blob/master/examples/example5.ipynb
-ought to be the linear energy-velocity parameter s of my paper; the latter is
-computed below and must be used in place of the parameter r in ttcpry!
-
 My software repository is https://github.com/bjornrommel/steinkauz under the
 project Subsurface-Velocity Ambiguity.
 
 @author: Björn E. Rommel
 @email: ttwean@seisrock.com
-@version: 3.0.1
-@date: 2024-02-03
+@version: 3.0.3
+@date: 2024-02-08
 """
 
 
@@ -71,7 +65,8 @@ class TTWean():
     @staticmethod
     def ttinit(
             vp0:float=None, vs0:float=None, delta:float=0.,
-            epsilon:float=0., wavetype:str="P", ggg:float=0.) -> np.array:
+            epsilon:float=0., wavetype:str="P", ggg:float=0.) -> (float,
+            float, np.array):
         """
         Precompute the linear energy-velocity parameters once.
 
@@ -199,9 +194,9 @@ class TTWean():
             reference P-velocity
         vs0 : float
             reference S-velocity
-        sss : np.array ([5x1])
-            linear energy-velocity parameters, default to isotropy
-            note, s0=1 set, s2 and s4 in use, s1 and s3 nan
+        sss : np.array ([5x1]), default to isotropy
+            linear energy-velocity parameters
+            note, s1=1, s2 and s4 in use, s1 and s3 set to np.NAN
         wavetype : char
             "P" : P-wave
             "SV" : S-wave
@@ -246,7 +241,7 @@ def main():
     # medium, wavetype or incidence angle
     vel = (
         TTWean.ttvel(
-            vp0=vp0, vs0=vs0,# sss=sss, wavetype=WAVETYPE,
+            vp0=vp0, vs0=vs0, sss=sss, wavetype=WAVETYPE,
             angle=np.deg2rad(ANGLE)))
     # print output
     text = f"{TITLE}\n"                        # title
