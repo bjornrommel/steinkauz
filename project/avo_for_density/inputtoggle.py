@@ -43,7 +43,7 @@ def inputtoggle(line=None, text="Toggle Jupyter input on/off"):  # pylint:disabl
                         $('div.input').show();
                     }
                     code_show = !code_show
-                }
+                }y
                 $( document ).ready(code_toggle);
             </script>
             <form action="javascript:code_toggle()">
@@ -54,3 +54,7 @@ def inputtoggle(line=None, text="Toggle Jupyter input on/off"):  # pylint:disabl
     toggle = toggle.replace("XYZ", text)
     # display
     dsp.display(dsp.HTML(toggle))
+
+
+if __name__ == "__main__":
+    inputtoggle(line=None, text="toggle Python")
