@@ -1,7 +1,6 @@
 # Steinkauz
 
-Projekt Steinkauz: a series of notebooks on various topics of seismic data processing.
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/bjornrommel/steinkauz/master)  
+Projekt Steinkauz: a series of notebooks, software and tutorials on various topics of seismic data processing.
 
 ## Subsurface-Velocity Ambiguity / Python
 
