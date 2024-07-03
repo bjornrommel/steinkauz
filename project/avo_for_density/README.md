@@ -6,5 +6,3 @@ Often, density is said to be unobtainable by AVO inversion. However, a Bayesian-
 
 Note, this notebook is a classic one: when using Jupyter notebook 7, switch to nbclassic.
 
-- [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/bjornrommel/steinkauz/master?labpath=%2Fproject%2Favo_for_density%2Favo_for_density.ipynb)
-
