@@ -3852,6 +3852,6 @@ def entry():
 
 if __name__ == "__main__":
     # set warnings and call main function
-    # !!! entry()   # plt.figure() issues a warning about a deprecated backend???
+    entry()   # plt.figure() issues a warning about a deprecated backend???
     # alternatively, call main function
-    main()
+    # !!! main()
