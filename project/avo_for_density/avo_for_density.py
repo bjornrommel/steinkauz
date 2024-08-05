@@ -1,8 +1,18 @@
 # -*- coding: utf-8 -*-
 """
+AVA for Density
+
+Inversion of AVA data over isotropic halfspaces. Mathematically, the inversion
+is a straightforward linear inversion for the three parameters relative P-
+velocity, S-velocity, and density.
+
 Python code for the "avo_for_density" Notebook.
 
-@author: Björn E. Rommel, version: 2.0.0
+@version: 2.1.0
+@date: 05.08.2024
+@author: Björn E. Rommel
+@email: info@seisrock.com
+
 """
 
 
@@ -12,6 +22,7 @@ import sys
 from copy import deepcopy as cp
 import numpy as np
 from numpy.random import default_rng as rnd
+from scipy import linalg as sl
 from matplotlib import pyplot as plt
 
 
@@ -77,6 +88,87 @@ WAVELETCOLOR = 'b-'                    # Matplotlib line options
 # environment
 PLOTENVIRONMENT = 'jupyter'
 CANVASENVIRONMENT = 'ipython'
+ENVIRONMENT = CANVASENVIRONMENT
+
+
+# definition of a figure dict
+fig = dict()   # pylint:disable=use-dict-literal
+
+
+# initialize AVA points
+# (amp, ..., deg and cov depend on the number of samples; so, empty lists)
+DATA = {
+    'nos': 0,         # number of data points
+    'deg': [],        # at incidence angle
+    'amp': [],        # data amplitude
+    'amp+std': [],    # data amplitude + STD
+    'amp-std': [],    # data amplitude - STD
+    'snr': np.NAN,    # single-valued signal-to-noise ratio
+    'cov': np.NAN,    # covariance
+    'icov': np.NAN,   # inverse covariance
+    'std': np.NAN}    # data standard deviation
+
+# AVA data
+coeff = cp(DATA)
+data = cp(DATA)
+ava = cp(DATA)
+
+
+# initialize models
+MODEL = {
+    'mod': np.full(3, fill_value=np.NAN),        # model
+    'cov': np.full((3, 3), fill_value=np.NAN),   # covariance
+    'std': np.full(3, fill_value=np.NAN)}        # standard deviation
+
+# halfspaces
+top = cp(MODEL)
+bot = cp(MODEL)
+
+# background
+back = cp(MODEL)
+
+# prior contrast model
+precon = cp(MODEL)
+
+# prior model in Bayes' theory
+prior = cp(MODEL)
+
+# posterior model in Bayes' theory
+post = cp(MODEL)
+
+# posterior contrast model
+poscon = cp(MODEL)
+
+
+# parameter in Bayes' theory
+para = {'vsp': np.NAN}   # S-to-P velocity ratio
+para = {'vsp': np.sqrt(3.)}   # S-to-P velocity ratio
+
+
+# suppress traceback
+if __name__ == '__main__':
+    PRINT = True
+    sys.tracebacklimit = 100   # default number of traceback levels
+else:                         # specifically for use with Jupyter
+    PRINT = True
+    sys.tracebacklimit = 100
+
+
+# indices
+IVP, IVS, IRHO = 0, 1, 2
+
+
+# lists / dicts abbreviations
+PROP = ['vp', 'vs', 'rho']
+DPROP = ['dvp', 'dvs', 'drho']
+HALFSPACE = {'top': top, 'bot': bot}
+
+
+# type None
+NONETYPE = type(None)
+
+
+# --- figure --- figure --- figure --- figure --- figure --- figure --- figure
 
 
 # definition of figure class
@@ -131,7 +223,7 @@ class Fig():
                     # remove
                     self.line[line].pop(0).remove()
 
-    def plt_line(self, x=None, y=None, key='other', opt='k-'):   # pylint:disable=invalid-name
+    def plt_line(self, x=None, y=None, key='other', opt='k-'):
         """
         Plot an AVA curve.
 
@@ -151,88 +243,11 @@ class Fig():
         None.
 
         """
+        # pylint:disable=invalid-name
         if not isinstance(y, NONETYPE):
             if isinstance(x, NONETYPE):
                 x = range(0, len(y), 1)
             self.line[key] = plt.plot(x, y, opt)
-
-
-# definition of a figure dict
-fig = dict()   # pylint:disable=use-dict-literal
-
-
-# initialize AVA points
-# (amp, ..., deg and cov depend on the number of samples; so, empty lists)
-DATA = {
-    'nos': 0,        # number of data points
-    'deg': [],       # at incidence angle
-    'amp': [],       # data amplitude
-    'amp+std': [],   # data amplitude + STD
-    'amp-std': [],   # data amplitude - STD
-    'snr': np.NAN,   # single-valued signal-to-noise ratio
-    'std': np.NAN}   # data standard deviation
-
-# AVA data
-coeff = cp(DATA)
-data = cp(DATA)
-ava = cp(DATA)
-
-
-# initialize models
-MODEL = {
-    'mod': np.full(3, fill_value=np.NAN),        # model
-    'cov': np.full((3, 3), fill_value=np.NAN),   # covariance
-    'std': np.full(3, fill_value=np.NAN)}        # standard deviation
-
-# halfspaces
-top = cp(MODEL)
-bot = cp(MODEL)
-
-# background
-back = cp(MODEL)
-
-# prior contrast model
-precon = cp(MODEL)
-
-# prior model in Bayes' theory
-prior = cp(MODEL)
-
-# posterior model in Bayes' theory
-post = cp(MODEL)
-
-# posterior contrast model
-poscon = cp(MODEL)
-
-
-# parameter in Bayes' theory
-para = {'vsp': np.NAN}   # S-to-P velocity ratio
-para = {'vsp': np.sqrt(3.)}   # S-to-P velocity ratio
-
-
-# suppress traceback
-if __name__ == '__main__':
-    DEBUG = True
-    sys.tracebacklimit = 100   # default number of traceback levels
-else:                         # specifically for use with Jupyter
-    DEBUG = True
-    sys.tracebacklimit = 100
-
-
-# indices
-IVP, IVS, IRHO = 0, 1, 2
-
-
-# lists / dicts abbreviations
-PROP = ['vp', 'vs', 'rho']
-DPROP = ['dvp', 'dvs', 'drho']
-HALFSPACE = {'top': top, 'bot': bot}
-
-
-# type None
-NONETYPE = type(None)
-
-
-# --- figure --- figure --- figure --- figure --- figure --- figure --- figure
 
 
 def init_plot(num=None, title=None):
@@ -287,7 +302,7 @@ def exit_plot(env=None):
 # --- input --- input --- input --- input --- input --- input --- input ---
 
 
-def get_data(snr=SNR):
+def get_noise(snr=SNR):
     """
     Get the signal-to-noise ratio and estimate a noise standard deviation.
 
@@ -334,27 +349,26 @@ def get_data(snr=SNR):
             snr = SNR
             # check of data standard deviation: negative, zero
         if snr <= 0.:
-            string = 'get_data: negative/zero signal-to-noise ratio {}!'
+            string = 'get_noise: negative/zero signal-to-noise ratio {}!'
             string = string.format(SNR)
             raise AssertionError(string)
         # check for numerical errors
         with np.errstate(
-                divide='raise', over='raise', under='raise',
-                invalid='raise'):
+                divide='raise', over='raise', under='raise', invalid='raise'):
             try:
                 1 / ((1. / (3. * snr)) ** 2)
             except ZeroDivisionError as toosmall:
-                string = 'get_data: (1 / 3 SNR) ** 2 with SNR = {} '
+                string = 'get_noise: (1 / 3 SNR) ** 2 with SNR = {} '
                 string += 'gives division by zero!'
                 string = string.format(snr)
                 raise AssertionError(string) from toosmall
             except OverflowError as toolarge:
-                string = 'get_data: (1 / 3 SNR) ** 2 with SNR = {} '
+                string = 'get_noise: (1 / 3 SNR) ** 2 with SNR = {} '
                 string += 'gives overflow!'
                 string = string.format(snr)
                 raise AssertionError(string) from toolarge
             except FloatingPointError as unknown:
-                string = 'get_data: (1 / 3 snr) ** 2 with SNR = {} '
+                string = 'get_noise: (1 / 3 snr) ** 2 with SNR = {} '
                 string += 'gives floating point error!'
                 string = string.format(data['std'])
                 raise AssertionError(string) from unknown
@@ -435,7 +449,8 @@ def mk_wavelet(name=WAVELETNAME, hwd=WAVELETHALFWIDTH, num=None):
     # generate normally distributed random noise
     trace = data['std'] * rnd().standard_normal(RIGHTWAVELET)
     # mix wavelet and noise
-    trace[LEFTSIGNAL:LEFTSIGNAL+2*hwd-1] += eval(WAVELETS[name])(hwd=hwd)   # pylint:disable=eval-used
+    trace[LEFTSIGNAL:LEFTSIGNAL+2*hwd-1] += (
+        eval(WAVELETS[name])(hwd=hwd))          # pylint:disable=eval-used
     # plot data
     fig[num].del_line()
     fig[num].plt_line(y=trace, opt=WAVELETCOLOR)
@@ -514,14 +529,14 @@ def replot_data_ava(mode=None, num=None):
                     fig[num].plt_line(
                         x=DEG, y=ava[key], key=key, opt=AVACOLOR)
     # exit figure
-    exit_plot(env=PLOTENVIRONMENT)
+    exit_plot(env=ENVIRONMENT)
 
 
 def comp_gmat(deg=DEG):
     """
     Compute the Pdown-Pup reflection matrix.
 
-    See Aki&Richards, Quantitative Seismology, Theory and Methods, I
+    See Aki&Richards, Quantitative Seismology, Theory and Methods, I.
 
     Parameters
     ----------
@@ -536,7 +551,7 @@ def comp_gmat(deg=DEG):
     Returns
     -------
     gmat : numpy ndarray
-        Reflection matrix of size nx3
+        Reflection matrix of size nx3.
     gmat2 : numpy ndarray
         Reflection matrix with each element squared.
 
@@ -670,6 +685,13 @@ def onclick(event, mode=None, num=None):
     -------
     None.
 
+    -> catch_data
+    -> inv_ava -> def_data_cov
+    -> comp_post_ava
+    -> plot_post_ava
+    -> get_poscon
+    -> exit_plot
+
     """
     if event.xdata and event.ydata:     # if triggered by in-the-box event
         # catch event
@@ -679,7 +701,7 @@ def onclick(event, mode=None, num=None):
             # continue with inversion
             if len(data['amp']) >= 3:   # min 3 samples for inversion
                 # invert AVA
-                invert_ava(mode=mode)
+                inv_ava(mode=mode)
                 # compute new AVA curve
                 comp_post_ava()
                 # plot new AVA curve
@@ -687,7 +709,7 @@ def onclick(event, mode=None, num=None):
                 # compute posterior contrast
                 get_poscon(mode=mode)
         # show curve + data points if any
-        exit_plot(env=CANVASENVIRONMENT)
+        exit_plot(env=ENVIRONMENT)
 
 
 def catch_data(mode=None, event=None):
@@ -724,7 +746,7 @@ def catch_data(mode=None, event=None):
             plt.plot(xxx, yyy, DATAERRORCOLOR)
 
 
-def invert_ava(mode=None):
+def inv_ava(mode=None):
     """
     Invert AVA for posterior property contrasts.
 
@@ -752,7 +774,7 @@ def invert_ava(mode=None):
 
     """
 
-    def create_covariance(nos=None, mode=None, snr=SNR):
+    def def_data_cov(mode=None, snr=SNR):
         """
         Make up a data covariance from a single-valued data standard deviation.
 
@@ -760,12 +782,15 @@ def invert_ava(mode=None):
 
         Parameters
         ----------
-        nos : int
-            Number of data points and, hence, dimension of the data covariance.
         mode : char
             Operational mode.
         snr : float, optional
             Signal-to-noise ratio. The default is 1, the neutral value.
+
+        Variables
+        ---------
+        nos : int
+            Number of data points and, hence, dimension of the data covariance.
 
         Returns
         -------
@@ -773,65 +798,48 @@ def invert_ava(mode=None):
             Covariance.
 
         """
+        # number of samples
+        nos = len(data['amp'])
+        # without uncertainty
         if '-' in mode:   # conventional
             # fake a covariance
-            cov = np.diag([1.] * nos)   # fall back on neutral
-            icov = cp(cov)              # short for inversion
-            # return
-            return cov, icov
+            data['cov'] = np.diag([1.] * nos)   # fall back on neutral
+        # with uncertainty
         if '+' in mode:   # Bayesian
             if np.isnan(data['std']):
                 # fake a covariance if necessary
-                cov = np.diag([snr] * nos)         # fall back on default
-                icov = np.diag([1. / snr] * nos)   # short for inversion
+                data['cov'] = np.diag([1. / snr] * nos)   # fall back default
             else:
                 # update to true data covariance!
-                cov = np.diag([data['std'] ** 2] * nos)
-                icov = np.diag([1. / (data['std'] ** 2)] * nos)
-            # return
-            return cov, icov
-        # error
-        sys.exit('programming error in create_covariance!')
+                data['cov'] = np.diag([data['std'] ** 2] * nos)
+        # inverse covariance
+        data['icov'] = np.linalg.inv(data['cov'])
 
     # compute reflection matrix
     gmat, _ = comp_gmat(deg=data['deg'])
-    # create and invert covariance
-    _, icov = create_covariance(nos=len(data['amp']), mode=mode)
+    # create data covariance
+    def_data_cov(mode=mode)
+    # compute inverse posterior covariance: data-controlled part
+    post['icov'] = np.transpose(gmat) @ data['icov'] @ gmat
+    # compute inverse posterior covariance: prior-controlled part
+    if 'AVA+' in mode:
+        if not np.any(np.isnan(prior['cov'])):
+            post['icov'] += prior['icov']
     # compute posterior covariance
-    post['cov'] = (   # initialize with data-controlled part
-        np.matmul(
-            np.matmul(
-                np.transpose(gmat),
-                icov),
-            gmat))
-    if 'AVA+' in mode:
-        if not np.any(np.isnan(prior['cov'])):
-            post['cov'] += (   # add model-controlled part
-                np.linalg.inv(prior['cov']))
-    post['cov'] = (   # invert to posterior uncertainty
-        np.linalg.inv(post['cov']))
+    post['cov'] = np.linalg.inv(post['icov'])
     # compute posterior standard deviation
-    post['std'] = (   # posterior standard deviation
-        np.sqrt(
-            np.diag(post['cov'])))
-    # compute weighted inversion amplitude
-    amp = (   # initialize data-controlled part
-        np.dot(
-            np.matmul(np.transpose(gmat), icov),
-            data['amp']))
+    post['std'] = np.sqrt(np.diag(post['cov']))
+    # compute posterior: data-controlled part
+    post['mod'] = np.transpose(gmat) @ data['icov'] @ data['amp']
+    # compute posterior: prior-controlled part
     if 'AVA+' in mode:
         if not np.any(np.isnan(prior['cov'])):
-            amp += (   # add model-controlled part
-                np.dot(
-                    np.linalg.inv(prior['cov']), prior['mod']))
-    # compute posterior model = perform inversion
-    post['mod'] = (   # normalized contrasts
-        np.dot(post['cov'], amp))
+            post['mod'] += prior['icov'] @ prior['mod']
+    # compute posterior model: finalize
+    post['mod'] = post['cov'] @ post['mod']
     # print
-    if DEBUG:
-        # ### printout(text='posterior model:', vals=post)
-        # ### printout(text='posterior contrast:', vals=poscon)
-        pass
+    if PRINT:
+        printout[mode](text='posterior model:', vals=post)
 
 
 def comp_post_ava():
@@ -950,7 +958,7 @@ def get_input(   # pylint:disable=too-many-arguments
     # and their covariance matrix
     get_prior(mode=mode)
     # collect data STD
-    get_data(snr=snr)
+    get_noise(snr=snr)
     # collect parameters
     get_para()
     # init data
@@ -1239,7 +1247,7 @@ def get_back(mode=None):
     # compute the background covariance
     back['cov'] = np.diag(back['std'] ** 2)
     # print
-    if DEBUG:
+    if PRINT:
         if not isinstance(mode, NONETYPE):
             printout[mode](text='background:', vals=back)
 
@@ -1281,7 +1289,7 @@ def get_precon(mode=None):
     # compute the prior contrast covariance
     precon['cov'] = np.diag(precon['std'] ** 2)
     # print
-    if DEBUG:
+    if PRINT:
         if not isinstance(mode, NONETYPE):
             printout[mode](text='prior contrast:', vals=precon)
 
@@ -1328,11 +1336,12 @@ def get_prior(mode=None):
             +
             ((top['mod'] * bot['std']) ** 2))
         /
-        (back['mod'] ** 2))
-    # compute the pror covariance
+        back['mod'] ** 2)
+    # compute the prior covariance
     prior['cov'] = np.diag(prior['std'] ** 2)
+    prior['icov'] = np.linalg.inv(prior['cov'])
     # print
-    if DEBUG:
+    if PRINT:
         if not isinstance(mode, NONETYPE):
             printout[mode](text='prior model:', vals=prior)
 
@@ -1368,14 +1377,14 @@ def get_poscon(mode=None):
 
     """
     # compute the posterior contrast
-    poscon['mod'] = (
-        np.matmul(
-            np.diag(back['mod']),
-            post['mod']))
+    poscon['mod'] = back['mod'] * post['mod']
     # compute the posterior STD
+    poscon['cov'] = np.diag(back['mod']) @ post['cov'] @ np.diag(back['mod'])
+    _, sss, _ = sl.svd(poscon['cov'])
+    poscon['std'] = np.sqrt(sss)
     poscon['std'] = back['mod'] * post['std']
     # print
-    if DEBUG:
+    if PRINT:
         if not isinstance(mode, NONETYPE):
             printout[mode](text='posterior contrast:', vals=poscon)
 
@@ -1471,13 +1480,13 @@ def do_wvl(
 
     """
     # get data parameter
-    get_data(snr=snr)
+    get_noise(snr=snr)
     # initialize figure
     init_plot(num=num, title=title)
     # prepare and plot wavelet
     mk_wavelet(name=name, hwd=hwd, num=num)
     # exit figure
-    exit_plot(env=PLOTENVIRONMENT)
+    exit_plot(env=ENVIRONMENT)
 
 
 def do_avadata(mode=None, num=None, title=None):
@@ -1519,7 +1528,8 @@ def do_avadata(mode=None, num=None, title=None):
     # plot prior AVA curve, catch data points, invert, plot posterior AVA curve
     plot_all(mode=mode, num=num)
     # exit figure
-    exit_plot(env=PLOTENVIRONMENT)
+    plt.ion()
+    exit_plot(env=ENVIRONMENT)
 
 
 # --- main --- main --- main --- main --- main --- main --- main --- main ---
