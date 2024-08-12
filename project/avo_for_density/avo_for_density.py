@@ -30,22 +30,22 @@ from matplotlib import pyplot as plt
 
 
 # default range of angles for the AVA curves
-DEG = [float(iii) / 1000. for iii in range(0, 40001)]
+DEG = [float(iii) / 0.1 for iii in range(0, 401)]
 
 
 # default top properties
-VP1, DVP1 = 2000, 20
-VS1, DVS1 = 1200, 12
-RHO1, DRHO1 = 2400, 100
+VP1, DVP1 = 2180, 220
+VS1, DVS1 = 880, 90
+RHO1, DRHO1 = 2450, 250
 
 # default bottom properties
-VP2, DVP2 = 2500, 25
-VS2, DVS2 = 1500, 15
-RHO2, DRHO2 = 2600, 100
+VP2, DVP2 = 2220, 220
+VS2, DVS2 = 920, 90
+RHO2, DRHO2 = 2550, 250
 
 
 # default signal-to-noise ratio
-SNR = 3   # some reasonable value
+SNR = 50   # some reasonable value
 
 
 # parameters for the prior AVA curve
@@ -142,7 +142,22 @@ poscon = cp(MODEL)
 
 # parameter in Bayes' theory
 para = {'vsp': np.NAN}   # S-to-P velocity ratio
-para = {'vsp': np.sqrt(3.)}   # S-to-P velocity ratio
+
+
+# debug mode without interactive data input
+DEBUG = False
+if DEBUG:
+    class EVENT():
+        def __init__(self):
+            self.xdata = cp(DEG)
+            prior = 2 * np.array([
+                (VP2 - VP1) / (VP2 + VP1),
+                (VS2 - VS1) / (VS2 + VS1),
+                (RHO2 - RHO1) / (RHO2 + RHO1)]) 
+            para['vsp'] = (VS2 + VS1) / (VP2 + VP1)
+            gmat, _ = comp_gmat(deg=self.xdata)
+            self.ydata = list(gmat @ prior)
+            pass
 
 
 # suppress traceback
@@ -356,26 +371,26 @@ def get_noise(snr=SNR):
         with np.errstate(
                 divide='raise', over='raise', under='raise', invalid='raise'):
             try:
-                1 / ((1. / (3. * snr)) ** 2)
+                1 / ((1. / snr) ** 2)
             except ZeroDivisionError as toosmall:
-                string = 'get_noise: (1 / 3 SNR) ** 2 with SNR = {} '
+                string = 'get_noise: (1 / SNR) ** 2 with SNR = {} '
                 string += 'gives division by zero!'
                 string = string.format(snr)
                 raise AssertionError(string) from toosmall
             except OverflowError as toolarge:
-                string = 'get_noise: (1 / 3 SNR) ** 2 with SNR = {} '
+                string = 'get_noise: (1 / SNR) ** 2 with SNR = {} '
                 string += 'gives overflow!'
                 string = string.format(snr)
                 raise AssertionError(string) from toolarge
             except FloatingPointError as unknown:
-                string = 'get_noise: (1 / 3 snr) ** 2 with SNR = {} '
+                string = 'get_noise: (1 / snr) ** 2 with SNR = {} '
                 string += 'gives floating point error!'
                 string = string.format(data['std'])
                 raise AssertionError(string) from unknown
     # preserve signal-to-noise ratio
     data['snr'] = snr
     # assign data standard deviation
-    data['std'] = 1. / (3. * snr)
+    data['std'] = 1. / snr
 
 
 # --- wavelet and noise --- wavelet and noise --- wavelet and noise ---
@@ -653,9 +668,12 @@ def plot_all(mode=None, num=None):
                 plt.plot(DEG, coeff[key], COEFFCOLOR)
     # register clicks on data points
     if 'DATA' in mode:
-        plt.gcf().canvas.mpl_connect(
-            'button_press_event',
-            lambda event: onclick(event, mode=mode, num=num))
+        if DEBUG:
+            onclick(EVENT(), mode=mode, num=num)
+        else:
+            plt.gcf().canvas.mpl_connect(
+                'button_press_event',
+                lambda event: onclick(event, mode=mode, num=num))
     # check directory for AVA curve
     if not os.path.isdir('ava'):
         os.mkdir('ava')
@@ -693,9 +711,13 @@ def onclick(event, mode=None, num=None):
     -> exit_plot
 
     """
-    if event.xdata and event.ydata:     # if triggered by in-the-box event
+    # triggered by in-the-box event
+    if DEBUG or (event.xdata and event.ydata):
         # catch event
-        catch_data(mode=mode, event=event)
+        if DEBUG:
+            copy_data(mode=mode, event=event)
+        else:
+            catch_data(mode=mode, event=event)
         # invert for posterior model
         if 'AVA' in mode:
             # continue with inversion
@@ -712,6 +734,42 @@ def onclick(event, mode=None, num=None):
         exit_plot(env=ENVIRONMENT)
 
 
+def copy_data(mode=None, event=None):
+    """
+    Fake incidence angle and amplitude of user-picked data.
+
+    Parameters
+    ----------
+    data : dict
+        'amp' amplitude
+        'deg' incidence angles
+    event : simplified MouseEvent
+        Coordinates of a list of fake pick events.
+
+    Returns
+    -------
+    None
+
+    """
+    # preserve event coordinates
+    data['deg'] = event.xdata
+    data['amp'] = event.ydata
+    data['nos'] = len(data['amp'])
+    # plot data points
+    if 'DATA' in mode:
+        for nos in range(data['nos']):
+            plt.plot(data['deg'][nos], data['amp'][nos], DATACOLOR)
+    # plot 3 x uncertainty
+    if 'DATA+' in mode:
+        if not np.isnan(data['std']):
+            for nos in range(data['nos']):
+                xxx = [data['deg'][nos], data['deg'][nos]]
+                yyy = [
+                    data['amp'][nos] - data['std'],
+                    data['amp'][nos] + data['std']]
+                plt.plot(xxx, yyy, DATAERRORCOLOR)
+            
+            
 def catch_data(mode=None, event=None):
     """
     Capture incidence angle and amplitude of user-picked data.
@@ -732,6 +790,8 @@ def catch_data(mode=None, event=None):
     # preserve event coordinates
     data['deg'] += [event.xdata]
     data['amp'] += [event.ydata]
+    # !!! data['deg'] = [ 0., 10., 20., 30.] * 4000
+    # !!! data['amp'] = [0.02909091, 0.02807271, 0.02524874, 0.02133609] * 4000
     data['nos'] = len(data['amp'])
     # plot data points
     if 'DATA' in mode:
@@ -806,12 +866,7 @@ def inv_ava(mode=None):
             data['cov'] = np.diag([1.] * nos)   # fall back on neutral
         # with uncertainty
         if '+' in mode:   # Bayesian
-            if np.isnan(data['std']):
-                # fake a covariance if necessary
-                data['cov'] = np.diag([1. / snr] * nos)   # fall back default
-            else:
-                # update to true data covariance!
-                data['cov'] = np.diag([data['std'] ** 2] * nos)
+            data['cov'] = np.diag([data['std'] ** 2] * nos)
         # inverse covariance
         data['icov'] = np.linalg.inv(data['cov'])
 
@@ -828,7 +883,8 @@ def inv_ava(mode=None):
     # compute posterior covariance
     post['cov'] = np.linalg.inv(post['icov'])
     # compute posterior standard deviation
-    post['std'] = np.sqrt(np.diag(post['cov']))
+    uuu, sss, vvv = sl.svd(post['cov'])
+    post['std'] = np.diag(uuu @ np.diag(np.sqrt(sss)) @ vvv)
     # compute posterior: data-controlled part
     post['mod'] = np.transpose(gmat) @ data['icov'] @ data['amp']
     # compute posterior: prior-controlled part
@@ -1380,8 +1436,8 @@ def get_poscon(mode=None):
     poscon['mod'] = back['mod'] * post['mod']
     # compute the posterior STD
     poscon['cov'] = np.diag(back['mod']) @ post['cov'] @ np.diag(back['mod'])
-    _, sss, _ = sl.svd(poscon['cov'])
-    poscon['std'] = np.sqrt(sss)
+    uuu, sss, vvv = sl.svd(poscon['cov'])
+    poscon['std'] = np.diag(uuu @ np.diag(np.sqrt(sss)) @ vvv)
     poscon['std'] = back['mod'] * post['std']
     # print
     if PRINT:
