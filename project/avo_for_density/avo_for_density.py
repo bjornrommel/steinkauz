@@ -8,8 +8,8 @@ velocity, S-velocity, and density.
 
 Python code for the "avo_for_density" Notebook.
 
-@version: 2.1.0
-@date: 05.08.2024
+@version: 2.2.0
+@date: 12.08.2024
 @author: Björn E. Rommel
 @email: info@seisrock.com
 
