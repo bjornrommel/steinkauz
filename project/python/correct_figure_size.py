@@ -1,13 +1,33 @@
 # -*- coding: utf-8 -*-
 """
-adjust_size
+Subject:
+correct_figure_size.py
 
-Adjust a figures width and height until the width matches the requested width.z
+Summary
+Adjust a figures width and height until the width matches the requested width.
+
+Provided function:
+adjust_size(fig=None, width=None, ghostcmd=None, postcmd=None)
+where
+fig: matplotlib.pyplot.figure(..)
+    a Matplotlib figure, see Matplotlib for accepted identifiers
+width: float
+    requested width in inches
+    default width: COLUMNWIDTH: width of 1 column in Geophysics
+    alternative width: PAGEWIDTH: width of 2 columns = page in Geophysics
+    user-defined width: any
+ghostcmd: char
+    ghostscript commands used to extract bounding box
+    default: "gswin64c -dBATCH -dNOPAUSE -q -sDEVICE=bbox "
+postcmd: dict
+    postscript commands used to save figure
+    default: POSTCMD = {
+        'pad_inches': 0, bbox_inches': 'tight', 'facecolor': 'xkcd:mint green'}
 
 @author: Björn Rommel
-@email: rommel@seisrock.com
-@version: 1.0.0
-@date: 28.8.2024
+@email: info@seisrock.com
+@version: 1.1.0
+@date: 10.9.2024
 """
 
 
@@ -23,7 +43,7 @@ from matplotlib import pyplot as plt
 # SEG figure widths in inch
 PC2IN = 20. / 72.           # conversion pica to inch
 COLUMNWIDTH = 20. * PC2IN   # column width 20pc
-FULLWIDTH = 42. * PC2IN     # two-column width incl. gap 42pc
+PAGEWIDTH = 42. * PC2IN     # two-column width incl. gap 42pc
 
 # conversion postscript points to matplotlib inches
 PT2IN = 1. / 72.
@@ -58,7 +78,8 @@ PRINT = 2   # 0 show figure, 1 print final size, 2 print intermediate size
 mpl.set_loglevel("error")   # suppress warning about transparency, etc
 
 
-def adjust_size(fig=None, width=None, ghostcmd=None, postcmd=None):
+def adjust_size(
+        fig=None, width=COLUMNWIDTH, ghostcmd=GHOSTCMD, postcmd=POSTCMD):
     """
     Modifying the figure size until it matches a requested width.
 
@@ -81,7 +102,7 @@ def adjust_size(fig=None, width=None, ghostcmd=None, postcmd=None):
     """
     # print
     if PRINT > 0:
-        print(f"requested figure size:    {COLUMNWIDTH}")
+        print(f"requested figure size:    {width}")
     # init parameter
     para = Para(width=width)
     # open a named temporary file
@@ -169,9 +190,11 @@ class Para():
         """
         # check residual error
         if 1. / sys.float_info.max > np.abs(new.wd - old.wd):
+            self.sp = None
             self.stop = True                                   # exit loop
         else:
             self.sp = self.err / (new.wd - old.wd) * self.sp   # update spacing
+            self.stop = False
 
 
 class Size():
@@ -346,7 +369,7 @@ def figure():
     plt.legend(loc='lower right')
     # show figure
     fig.tight_layout()
-    plt.show()
+    plt.draw()
     # return
     return fig
 
