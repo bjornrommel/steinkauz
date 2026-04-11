@@ -68,8 +68,8 @@ DPI and MAG specify the DPI and magnification of the PNG output, where higher
 DPI and smaller MAG provide better resolution at higher expense in time and
 disk space
 
-23 May 2023
-version 2.1.1
+11 April 2026
+version 2.1.2
 @author: Björn E. Rommel
 """
 
@@ -1382,7 +1382,7 @@ class Steinkauz(Magics):
 def load_ipython_extension(ipython):
     """
     Any module file that define a function named `load_ipython_extension` can
-    be loaded via `%load_ext module.path` or be configured to beautoloaded by
+    be loaded via `%load_ext module.path` or be configured to be autoloaded by
     IPython at startup time.
     (https://ipython.readthedocs.io/en/stable/config/custommagics.html )
     """

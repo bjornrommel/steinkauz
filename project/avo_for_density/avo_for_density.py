@@ -30,22 +30,22 @@ from matplotlib import pyplot as plt
 
 
 # default range of angles for the AVA curves
-DEG = [float(iii) / 0.1 for iii in range(0, 401)]
+DEG = [float(iii) / 100 for iii in range(0, 4001)]
 
 
 # default top properties
-VP1, DVP1 = 2180, 220
-VS1, DVS1 = 880, 90
-RHO1, DRHO1 = 2450, 250
+VP1, DVP1 = 2180, 22000000
+VS1, DVS1 = 880, 9000000
+RHO1, DRHO1 = 2450, 25000000
 
 # default bottom properties
-VP2, DVP2 = 2220, 220
-VS2, DVS2 = 920, 90
-RHO2, DRHO2 = 2550, 250
+VP2, DVP2 = 2220, 22000000
+VS2, DVS2 = 920, 9000000
+RHO2, DRHO2 = 2550, 25000000
 
 
 # default signal-to-noise ratio
-SNR = 50   # some reasonable value
+SNR = 20   # some reasonable value
 
 
 # parameters for the prior AVA curve
@@ -142,22 +142,37 @@ poscon = cp(MODEL)
 
 # parameter in Bayes' theory
 para = {'vsp': np.NAN}   # S-to-P velocity ratio
+para = {'vsp': 1./np.sqrt(3)}   # S-to-P velocity ratio
 
 
 # debug mode without interactive data input
-DEBUG = False
+DEBUG = True
 if DEBUG:
     class EVENT():
-        def __init__(self):
-            self.xdata = cp(DEG)
-            prior = 2 * np.array([
-                (VP2 - VP1) / (VP2 + VP1),
-                (VS2 - VS1) / (VS2 + VS1),
-                (RHO2 - RHO1) / (RHO2 + RHO1)]) 
-            para['vsp'] = (VS2 + VS1) / (VP2 + VP1)
+        """
+        Substitute an interactive Matplotlib event with fake data.
+
+        """
+        # pylint:disable=too-few-public-methods
+        def __init__(self, deg=DEG):
+            """
+            Initialize some fake data for debugging purposes.
+
+            When in use, prior and para must have been defined.
+            
+            Parameters
+            ----------
+            deg : np.array
+                Incidence angles in degree.
+
+            Returns
+            -------
+            None.
+
+            """
+            self.xdata = cp(deg)
             gmat, _ = comp_gmat(deg=self.xdata)
-            self.ydata = list(gmat @ prior)
-            pass
+            self.ydata = list(gmat @ prior['mod'])
 
 
 # suppress traceback
@@ -238,7 +253,7 @@ class Fig():
                     # remove
                     self.line[line].pop(0).remove()
 
-    def plt_line(self, x=None, y=None, key='other', opt='k-'):
+    def plt_line(self, x=None, y=None, key='other', opt='k-', label=None):
         """
         Plot an AVA curve.
 
@@ -252,6 +267,8 @@ class Fig():
             Identifier of a line. Default is 'other'.
         opt : str, optional
             Matplotlib color for the AVA curve. The default is standard black.
+        label : char
+            Legend for line.
 
         Returns
         -------
@@ -262,7 +279,9 @@ class Fig():
         if not isinstance(y, NONETYPE):
             if isinstance(x, NONETYPE):
                 x = range(0, len(y), 1)
-            self.line[key] = plt.plot(x, y, opt)
+            self.line[key] = plt.plot(x, y, opt, label=label)
+        if label:
+            plt.legend()
 
 
 def init_plot(num=None, title=None):
@@ -577,20 +596,52 @@ def comp_gmat(deg=DEG):
         raise AssertionError(string)
     # convert angle from degree to radiant
     rad = np.deg2rad(deg)
-    # compute normalized Fréchet derivative
-    # (in form of a matrix[angle, component])
-    # (see Aki&Richards, Quantitative Seismology, Theory and Methods, I)
-    gmat = np.array([
-        0.5 / np.cos(rad) ** 2,
-        -4. * para['vsp'] ** 2 * np.sin(rad) ** 2,
-        0.5 * (1. - 4. * para['vsp'] ** 2 * np.sin(rad) ** 2)],
-        dtype=float)
-    gmat = gmat.transpose()
+    gmat = comp_aki(rad=rad)
     # square
-    gmat2 = gmat ** 2
+    gmat2 = gmat ** 2   # element-wise, to be used only for error propagation
     # return
     return gmat, gmat2
 
+
+def comp_aki(rad=np.deg2rad(DEG)):
+    """
+    Compute normalized Fréchet derivatives after Aki & Richards.
+    
+    See Aki&Richards, Quantitative Seismology, Theory and Methods, I.
+    
+    Parameters
+    ----------
+    rad : list
+        Incidence angles in radiant. Default is numpy.deg2rad(DEG).
+
+    Globals
+    -------
+    para : dict
+        'vsp': S-to-P velocity ratio
+
+    Returns
+    -------
+    gmat : numpy ndarray
+        Reflection matrix of size nx3.    
+    """
+    # Fréchet derivatives in form of a matrix[angle, component]
+    gmat = np.array([
+        0.5 / np.cos(rad) ** 2,
+        -4. * para['vsp'] ** 2 * np.sin(rad) ** 2,
+        0.5 - 2. * para['vsp'] ** 2 * np.sin(rad) ** 2],
+        dtype=float)
+    gmat = np.transpose(gmat)   # shape = (no angles x no parameters)
+    #print(np.linalg.inv(np.transpose(gmat) @ gmat))
+    #gmat = np.array([
+    #    0.5 / np.cos(rad) ** 2,
+    #    -4. * para['vsp'] ** 2 * np.sin(rad) ** 2,
+    #    0.5 * np.tan(rad) ** 2 - 2. * para['vsp'] ** 2 * np.sin(rad) ** 2],
+    #    dtype=float)
+    #gmat = np.transpose(gmat)   # shape = (no angles x no parameters)
+    #print(np.linalg.inv(np.transpose(gmat) @ gmat))
+    # return
+    return gmat
+    
 
 def comp_coeff(mode=None):
     """
@@ -626,7 +677,7 @@ def comp_coeff(mode=None):
         gmat, gmat2 = comp_gmat()
         # compute reflection coefficients
         # (in form of a vector[angle])
-        coeff['amp'] = np.dot(gmat, prior['mod'])
+        coeff['amp'] = gmat @ prior['mod']
         # check mode
         if 'COEFF+' in mode:
             # check sanity
@@ -640,7 +691,7 @@ def comp_coeff(mode=None):
             coeff['amp-std'] = coeff['amp'] - coeff['std']
 
 
-def plot_all(mode=None, num=None):
+def plot_all(mode=None, num=None, deg=DEG, priorlabel=None, postlabel=None):
     """
     Plot an AVA curve.
 
@@ -650,6 +701,14 @@ def plot_all(mode=None, num=None):
         Operational mode.
         'ava' produces an AVA curve based on a prior model.
         'data' inputs AVA data points and produces a best-fitting AVA curve.
+    num : int
+        Figure number.
+    deg : np.array
+        Array of incidence angles.
+    priorlabel : char
+        Legend for prior AVA-curve.
+    postlabel : char
+        Legend for posterior AVA-curve
 
     Returns
     -------
@@ -661,19 +720,22 @@ def plot_all(mode=None, num=None):
     plt.ylim(bottom=-1., top=+1.)
     # plot curve
     if 'COEFF' in mode:
-        plt.plot(DEG, coeff['amp'], COEFFCOLOR)
+        plt.plot(deg, coeff['amp'], COEFFCOLOR, label=priorlabel)
     if 'COEFF+' in mode:
         for key in ['amp+std', 'amp-std']:
             if len(coeff[key]) > 0:
-                plt.plot(DEG, coeff[key], COEFFCOLOR)
+                plt.plot(deg, coeff[key], COEFFCOLOR)
+    # plot legend
+    plt.legend()
     # register clicks on data points
     if 'DATA' in mode:
         if DEBUG:
-            onclick(EVENT(), mode=mode, num=num)
+            onclick(EVENT(), mode=mode, num=num, postlabel=postlabel)
         else:
             plt.gcf().canvas.mpl_connect(
                 'button_press_event',
-                lambda event: onclick(event, mode=mode, num=num))
+                lambda event: onclick(
+                    event, mode=mode, num=num, postlabel=postlabel))
     # check directory for AVA curve
     if not os.path.isdir('ava'):
         os.mkdir('ava')
@@ -682,7 +744,7 @@ def plot_all(mode=None, num=None):
     plt.savefig("ava/curve.eps", dpi=1200, format='eps')
 
 
-def onclick(event, mode=None, num=None):
+def onclick(event, mode=None, num=None, postlabel=None):
     """
     Controls a sequence of events after a user having clicked a data point.
 
@@ -698,6 +760,8 @@ def onclick(event, mode=None, num=None):
         Operational mode, here, either 'data' or 'ava+data'
     num : int
         Figure number.
+    postlabel : char
+        Legend for posterior AVA-curve.
 
     Returns
     -------
@@ -727,7 +791,7 @@ def onclick(event, mode=None, num=None):
                 # compute new AVA curve
                 comp_post_ava()
                 # plot new AVA curve
-                plot_post_ava(mode=mode, num=num)
+                plot_post_ava(mode=mode, num=num, postlabel=postlabel)
                 # compute posterior contrast
                 get_poscon(mode=mode)
         # show curve + data points if any
@@ -768,8 +832,8 @@ def copy_data(mode=None, event=None):
                     data['amp'][nos] - data['std'],
                     data['amp'][nos] + data['std']]
                 plt.plot(xxx, yyy, DATAERRORCOLOR)
-            
-            
+
+
 def catch_data(mode=None, event=None):
     """
     Capture incidence angle and amplitude of user-picked data.
@@ -790,8 +854,6 @@ def catch_data(mode=None, event=None):
     # preserve event coordinates
     data['deg'] += [event.xdata]
     data['amp'] += [event.ydata]
-    # !!! data['deg'] = [ 0., 10., 20., 30.] * 4000
-    # !!! data['amp'] = [0.02909091, 0.02807271, 0.02524874, 0.02133609] * 4000
     data['nos'] = len(data['amp'])
     # plot data points
     if 'DATA' in mode:
@@ -834,7 +896,7 @@ def inv_ava(mode=None):
 
     """
 
-    def def_data_cov(mode=None, snr=SNR):
+    def def_data_cov(mode=None):
         """
         Make up a data covariance from a single-valued data standard deviation.
 
@@ -844,8 +906,6 @@ def inv_ava(mode=None):
         ----------
         mode : char
             Operational mode.
-        snr : float, optional
-            Signal-to-noise ratio. The default is 1, the neutral value.
 
         Variables
         ---------
@@ -898,7 +958,7 @@ def inv_ava(mode=None):
         printout[mode](text='posterior model:', vals=post)
 
 
-def comp_post_ava():
+def comp_post_ava(grad=DEG):
     """
     Plot a new AVA curve based on the posterior model.
 
@@ -908,27 +968,20 @@ def comp_post_ava():
 
     """
     # convert incidence angles
-    rad = np.deg2rad(DEG)
-    # compute normalized Fréchet derivative
-    # (in form of a matrix[angle, component])
-    # (see Aki&Richards, Quantitative Seismology, Theory and Methods, I)
-    gmat = np.array([
-        0.5 / np.cos(rad) ** 2,
-        -4. * para['vsp'] ** 2 * np.sin(rad) ** 2,
-        0.5 * (1. - 4. * para['vsp'] ** 2 * np.sin(rad) ** 2)],
-        dtype=float)
-    gmat = gmat.transpose()
+    rad = np.deg2rad(grad)
+    # compute normalized Fréchet derivatives
+    gmat = comp_aki(rad=rad)
     gmat2 = gmat ** 2
     # compute reflection coefficients
     # (in form of a vector[angle])
-    ava['amp'] = np.dot(gmat, post['mod'])
+    ava['amp'] = gmat @ post['mod']
     if not np.all(np.isnan(post['std'])):
         ava['std'] = np.sqrt(np.dot(gmat2, post['std']**2))
         ava['amp+std'] = ava['amp'] + ava['std']
         ava['amp-std'] = ava['amp'] - ava['std']
 
 
-def plot_post_ava(mode=None, num=None):
+def plot_post_ava(mode=None, num=None, postlabel=None):
     """
     Plot the AVA curve from the posterior model
 
@@ -936,6 +989,10 @@ def plot_post_ava(mode=None, num=None):
     ----------
     mode : char, optional
         Operational mode. The default is None.
+    num : int
+        Figure number.
+    postlabel : char
+        Legend for posterior AVA-curve.
 
     Returns
     -------
@@ -947,15 +1004,15 @@ def plot_post_ava(mode=None, num=None):
     # plot line
     if 'AVA' in mode:
         fig[num].plt_line(
-            x=DEG, y=ava['amp'], key='amp', opt=AVACOLOR)
+            x=DEG, y=ava['amp'], key='amp', opt=AVACOLOR, label=postlabel)
         if 'AVA+' in mode:
             if len(ava['amp+std']) > 0:
                 fig[num].plt_line(
-                    x=DEG, y=ava['amp+std'], key='amp+std',
-                    opt=AVACOLOR)
+                    x=DEG, y=ava['amp+std'], key='amp+std', opt=AVACOLOR)
                 fig[num].plt_line(
-                    x=DEG, y=ava['amp-std'], key='amp-std',
-                    opt=AVACOLOR)
+                    x=DEG, y=ava['amp-std'], key='amp-std', opt=AVACOLOR)
+        if len(ava['amp'] == 3):   # do it after having inverted first time
+            plt.legend()
 
 
 # -----------------------------------------------------------------------------
@@ -1438,7 +1495,6 @@ def get_poscon(mode=None):
     poscon['cov'] = np.diag(back['mod']) @ post['cov'] @ np.diag(back['mod'])
     uuu, sss, vvv = sl.svd(poscon['cov'])
     poscon['std'] = np.diag(uuu @ np.diag(np.sqrt(sss)) @ vvv)
-    poscon['std'] = back['mod'] * post['std']
     # print
     if PRINT:
         if not isinstance(mode, NONETYPE):
@@ -1545,7 +1601,7 @@ def do_wvl(
     exit_plot(env=ENVIRONMENT)
 
 
-def do_avadata(mode=None, num=None, title=None):
+def do_avadata(mode=None, num=None, title=None, priorlabel=None):
     """
     Create an AVA curve from prior or interactively, then invert.
 
@@ -1565,6 +1621,8 @@ def do_avadata(mode=None, num=None, title=None):
         Figure number.
     title : char
         Figure title.
+    priorlabel : char
+        Label for prior AVA curve.
 
     Returns
     -------
@@ -1582,7 +1640,8 @@ def do_avadata(mode=None, num=None, title=None):
     # initialize figure
     init_plot(num=num, title=title)
     # plot prior AVA curve, catch data points, invert, plot posterior AVA curve
-    plot_all(mode=mode, num=num)
+    plot_all(
+        mode=mode, num=num, priorlabel=priorlabel, postlabel="posterior model")
     # exit figure
     plt.ion()
     exit_plot(env=ENVIRONMENT)
@@ -1601,7 +1660,9 @@ if __name__ == '__main__':
         title='Triangular Wavelet with Noise Contamination')
     # create an AVA curve from a prior model, catch interactively data points
     # and invert for a posterior model, re-create the corresponding AVA curve
+    #do_avadata(
+    #    mode='COEFF-DATA-AVA-', num=2, title='Classical AVA Analysis',
+    #    priorlabel='prior model')
     do_avadata(
-        mode='COEFF-DATA-AVA-', num=2, title='Classical AVA Analysis')
-    do_avadata(
-        mode='COEFF+DATA+AVA+', num=3, title='AVA Analysis under Uncertainty')
+        mode='COEFF+DATA+AVA+', num=3, title='AVA Analysis under Uncertainty',
+        priorlabel='prior model')

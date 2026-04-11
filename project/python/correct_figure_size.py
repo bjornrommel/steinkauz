@@ -1,33 +1,81 @@
 # -*- coding: utf-8 -*-
 """
-Subject:
-correct_figure_size.py
 
-Summary
+
+                            MYSEGY
+
+Provide functions to prepare figures for publication with the SEG.
+
+
+                            adjust_size
+
 Adjust a figures width and height until the width matches the requested width.
+Use the final figure width when finally saving your figure.
 
-Provided function:
-adjust_size(fig=None, width=None, ghostcmd=None, postcmd=None)
+adjust_size(fig=None, width=COLUMNWIDTH, ghostcmd=GHOSTCMD, postcmd=POSTCMD),
 where
-fig: matplotlib.pyplot.figure(..)
-    a Matplotlib figure, see Matplotlib for accepted identifiers
-width: float
-    requested width in inches
-    default width: COLUMNWIDTH: width of 1 column in Geophysics
-    alternative width: PAGEWIDTH: width of 2 columns = page in Geophysics
-    user-defined width: any
-ghostcmd: char
-    ghostscript commands used to extract bounding box
-    default: "gswin64c -dBATCH -dNOPAUSE -q -sDEVICE=bbox "
-postcmd: dict
-    postscript commands used to save figure
-    default: POSTCMD = {
-        'pad_inches': 0, bbox_inches': 'tight', 'facecolor': 'xkcd:mint green'}
+    fig: matplotlib.pyplot.figure(..)
+        Matplotlib figure, see Matplotlib for accepted identifiers.
+    width: float
+        Requested width in inches.
+        Default width: COLUMNWIDTH, width of 1 column in Geophysics.
+        Alternative width: PAGEWIDTH, width of 2 columns = page in Geophysics.
+        User-defined width: any.
+    ghostcmd: char
+        Ghostscript commands used to extract bounding box.
+        Default: GHOSTCMD = "gswin64c -dBATCH -dNOPAUSE -q -sDEVICE=bbox ".
+        Change the executable gswin64c to whatever ghostscript you have, but
+        keep the other options!
+    postcmd: dict
+        Postscript commands used to save figure.
+        Default: POSTCMD = {'pad_inches': 0, bbox_inches': 'tight',
+        'facecolor': 'xkcd:mint green'}
+        The no-padding and tight-box options remove any extra margin around the
+        actual figure area, whereas the facecolor, whatever it is, only
+        visualizes it.
+
+Typical use case is
+    from matplotlib import pyplot as plt     # import pyplot
+    myfig = plt.figure()                     # init a figure
+    width, height = adjust_size(fig=myfig)   # extract the nominal width
+    myfig.fig.set_figwidth(width)            # set nominal figure width
+    plt.tight_layout(pad=0.0)                # tighten bounding box, zero pad
+    plt.savefig(                             # save figure
+        <filename>, format='eps', 'pad_inches'=0, bbox_inches'='tight')
+to obtain the nominal figure width and, then, create a tight figure of exactly
+1-column width.
+
+
+                            set_style
+
+Set a Matplotlib figure to a specific style.
+
+set_style(style=STYLESHEET)
+where
+    style: file
+        A file containing a style sheet. See
+        https://matplotlib.org/stable/users/explain/customizing.html
+
+Typical use case is simply
+    set_style()
+to apply a style conforming to SEG's requirements.
+
+
+                            set_font
+
+Set fonts in a Matplotlib figure to specific values.
+
+set_font()
+
+Typical use case is simply
+    set_font()
+to set fonts conforming to SEG's requirements.
+
 
 @author: Björn Rommel
 @email: info@seisrock.com
-@version: 1.1.0
-@date: 10.9.2024
+@version: 2.0.0
+@date: 11.9.2024
 """
 
 
@@ -40,46 +88,63 @@ import matplotlib as mpl
 from matplotlib import pyplot as plt
 
 
-# SEG figure widths in inch
-PC2IN = 20. / 72.           # conversion pica to inch
-COLUMNWIDTH = 20. * PC2IN   # column width 20pc
-PAGEWIDTH = 42. * PC2IN     # two-column width incl. gap 42pc
-
 # conversion postscript points to matplotlib inches
 PT2IN = 1. / 72.
 
+# conversion picas to inches
+PC2IN = 20. / 72.
+
 # max width residual
-MAXERROR = 1.0e-3   # in inch
+MAXERROR = 1.0e-3
 
 
 # --- user-defined commands ---------------------------------------------------
 
 
+# SEG figure widths in inch
+# change as you see fit
+COLUMNWIDTH = 20. * PC2IN   # column width 20pc
+PAGEWIDTH = 42. * PC2IN     # two-column width incl. gap 42pc
+
 # ghostscript command to extract bounding box
+# correct the executable gswin64c, but keep the remaining options
 GHOSTCMD = "gswin64c -dBATCH -dNOPAUSE -q -sDEVICE=bbox "
 
 # additional postscript commands
+# change the face color, but the other options are needed for a tight box
 POSTCMD = {                           # as dict
     'pad_inches': 0,                  # no padding
     'bbox_inches': 'tight',           # tight layout
     'facecolor': 'xkcd:mint green'}   # background showing figure box
 
+# matplotlib style sheet
+# any style sheet will do
+STYLESHEET = 'seg.mplstyle'
+
 # additional information
 PRINT = 2   # 0 show figure, 1 print final size, 2 print intermediate size
+
+
+# --- set the figure style ----------------------------------------------------
+
+
+def set_style(style=STYLESHEET):
+    """
+    Importing Matplotlib style for SEG publications.
+
+    Returns
+    -------
+    None.
+
+    """
+    # import and use a style
+    plt.style.use(style)
 
 
 # -----------------------------------------------------------------------------
 
 
-# pylint:disable=invalid-name
-
-
-# matplotlib
-mpl.set_loglevel("error")   # suppress warning about transparency, etc
-
-
-def adjust_size(
-        fig=None, width=COLUMNWIDTH, ghostcmd=GHOSTCMD, postcmd=POSTCMD):
+def set_size(fig=None, width=None, ghostcmd=None, postcmd=None):
     """
     Modifying the figure size until it matches a requested width.
 
@@ -96,15 +161,24 @@ def adjust_size(
 
     Returns
     -------
-    new : Size
+    (new.wd, new.ht) : dict of floats
         figure width and height
 
     """
-    # print
-    if PRINT > 0:
-        print(f"requested figure size:    {width}")
+    # default
+    if width is None:
+        width = COLUMNWIDTH
+    if ghostcmd is None:
+        ghostcmd = GHOSTCMD
+    if postcmd is None:
+        postcmd = POSTCMD
+    # matplotlib
+    mpl.set_loglevel("error")   # suppress warning about transparency, etc
     # init parameter
     para = Para(width=width)
+    # print
+    if PRINT > 0:
+        print(f"requested figure width:   {width:9.6f}")
     # open a named temporary file
     with tf.NamedTemporaryFile(mode="w+") as fp:   # suffix=".eps" fails later
         # add postfix (for some reasons needed to save in 'eps' format)
@@ -127,7 +201,7 @@ def adjust_size(
             old.advance(new=new)
     # print
     if PRINT > 0:
-        print(f"final figure size:        {new.wd}, {new.ht}")
+        print(f"final figure size:        {new.wd:9.6f}, {new.ht:9.6f}")
     # return
     return new.wd, new.ht
 
@@ -240,7 +314,7 @@ class Size():
         self.ht = (float(result[4]) - float(result[2])) * PT2IN
         # print
         if PRINT > 1:
-            print(f"intermediate figure size: {self.wd}, {self.ht}")
+            print(f"intermediate figure size: {self.wd:9.6f}, {self.ht:9.6f}")
         # return
         return self
 
@@ -317,6 +391,32 @@ class Size():
 # -----------------------------------------------------------------------------
 
 
+def set_font():
+    """
+    Define the fonts used in all SEG-conforming plots.
+
+    Returns
+    -------
+    None.
+
+    """
+    # set fonts https://stackoverflow.com/a/39566040
+    plt.rc('text', usetex=True)              # Latex for versatility
+    plt.rc('font', family='Helvetica')       # fontstyle
+    plt.rc('ps', usedistiller='xpdf')        # avoiding bitmap
+    plt.rc('font', size=8)                   # controls default text sizes
+    plt.rc('axes', titlesize=8)              # fontsize of the axes title
+    plt.rc('axes', labelsize=8)              # fontsize of x and y labels
+    plt.rc('xtick', labelsize=8)             # fontsize of the tick labels
+    plt.rc('ytick', labelsize=8)             # fontsize of the tick labels
+    plt.rc('legend', fontsize=8)             # legend fontsize
+    plt.rc('figure', titlesize=8)            # fontsize of the figure title
+    plt.rc('figure', figsize=(20./6., 5.))   # figure size for 1 column SEG
+
+
+# --- set up a test case ------------------------------------------------------
+
+
 def main():
     """
     Test the module.
@@ -331,7 +431,7 @@ def main():
     fig = figure()
     # use module
     wd, ht = (
-        adjust_size(
+        set_size(
             fig=fig, width=COLUMNWIDTH, ghostcmd=GHOSTCMD, postcmd=POSTCMD))
 
 
@@ -367,6 +467,8 @@ def figure():
         label='subsets of uplims and lolims')
     # plot legend
     plt.legend(loc='lower right')
+    # set style
+    set_font()
     # show figure
     fig.tight_layout()
     plt.draw()
