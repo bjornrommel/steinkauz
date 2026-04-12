@@ -35,12 +35,12 @@ You are invited to improve any notebook or even to donate one of your own making
 
 ## Credit  
 
-You can use the module and notebooks, but, please, give credit where credit is due.   
+You can use the module and notebooks, but, please, give credit where credit is due.
 
 ## Contact  
 
 ## Acknowledgements  
 
-The Jupyter magic steinkauz has been inspired by Dan MacKinlay's latex_fragment (https://github.com/danmackinlay/latex_fragment)  
+The Jupyter magic steinkauz has been inspired by Dan MacKinlay's latex_fragment (https://github.com/danmackinlay/latex_fragment)
 And, then, there are all the contributors to Jupyter Notebook!
 

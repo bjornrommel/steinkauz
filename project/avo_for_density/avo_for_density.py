@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-AVA for Density
+AVA for Density.
 
 Inversion of AVA data over isotropic halfspaces. Mathematically, the inversion
 is a straightforward linear inversion for the three parameters relative P-
@@ -8,7 +8,7 @@ velocity, S-velocity, and density.
 
 Python code for the "avo_for_density" Notebook.
 
-@version: 2.2.0
+@version: 2.3.0
 @date: 12.08.2024
 @author: Björn E. Rommel
 @email: info@seisrock.com
@@ -24,6 +24,8 @@ import numpy as np
 from numpy.random import default_rng as rnd
 from scipy import linalg as sl
 from matplotlib import pyplot as plt
+import matplotlib as mpl
+mpl.set_loglevel("error")
 
 
 # --- change --- change --- change --- change --- change --- change --- change
@@ -146,20 +148,21 @@ para = {'vsp': 1./np.sqrt(3)}   # S-to-P velocity ratio
 
 
 # debug mode without interactive data input
-DEBUG = True
+DEBUG = False
 if DEBUG:
-    class EVENT():
+    class Event():
         """
         Substitute an interactive Matplotlib event with fake data.
 
         """
+
         # pylint:disable=too-few-public-methods
         def __init__(self, deg=DEG):
             """
             Initialize some fake data for debugging purposes.
 
             When in use, prior and para must have been defined.
-            
+
             Parameters
             ----------
             deg : np.array
@@ -179,9 +182,9 @@ if DEBUG:
 if __name__ == '__main__':
     PRINT = True
     sys.tracebacklimit = 100   # default number of traceback levels
-else:                         # specifically for use with Jupyter
+else:                          # specifically for use with Jupyter
     PRINT = True
-    sys.tracebacklimit = 100
+    sys.tracebacklimit = 10
 
 
 # indices
@@ -253,6 +256,7 @@ class Fig():
                     # remove
                     self.line[line].pop(0).remove()
 
+    # pylint: disable=too-many-arguments
     def plt_line(self, x=None, y=None, key='other', opt='k-', label=None):
         """
         Plot an AVA curve.
@@ -606,9 +610,9 @@ def comp_gmat(deg=DEG):
 def comp_aki(rad=np.deg2rad(DEG)):
     """
     Compute normalized Fréchet derivatives after Aki & Richards.
-    
+
     See Aki&Richards, Quantitative Seismology, Theory and Methods, I.
-    
+
     Parameters
     ----------
     rad : list
@@ -622,7 +626,7 @@ def comp_aki(rad=np.deg2rad(DEG)):
     Returns
     -------
     gmat : numpy ndarray
-        Reflection matrix of size nx3.    
+        Reflection matrix of size nx3.
     """
     # Fréchet derivatives in form of a matrix[angle, component]
     gmat = np.array([
@@ -631,27 +635,23 @@ def comp_aki(rad=np.deg2rad(DEG)):
         0.5 - 2. * para['vsp'] ** 2 * np.sin(rad) ** 2],
         dtype=float)
     gmat = np.transpose(gmat)   # shape = (no angles x no parameters)
-    #print(np.linalg.inv(np.transpose(gmat) @ gmat))
-    #gmat = np.array([
-    #    0.5 / np.cos(rad) ** 2,
-    #    -4. * para['vsp'] ** 2 * np.sin(rad) ** 2,
-    #    0.5 * np.tan(rad) ** 2 - 2. * para['vsp'] ** 2 * np.sin(rad) ** 2],
-    #    dtype=float)
-    #gmat = np.transpose(gmat)   # shape = (no angles x no parameters)
-    #print(np.linalg.inv(np.transpose(gmat) @ gmat))
     # return
     return gmat
-    
+
 
 def comp_coeff(mode=None):
     """
-    Displays a theoretical AVA curve as computed from the prior.
+    Display a theoretical AVA curve as computed from the prior.
 
-    Parameters:
-
+    Parameters
+    ----------
+    mode : char
+        Operational mode.
+        'ava' Produces an AVA curve based on a prior model.
+        'data' Inputs AVA data points and produces a best-fitting AVA curve.
 
     Globals
-    ----------
+    -------
     para : dict
         'vsp' S-to-P velocity ratio.
     prior : dict
@@ -730,7 +730,7 @@ def plot_all(mode=None, num=None, deg=DEG, priorlabel=None, postlabel=None):
     # register clicks on data points
     if 'DATA' in mode:
         if DEBUG:
-            onclick(EVENT(), mode=mode, num=num, postlabel=postlabel)
+            onclick(Event(), mode=mode, num=num, postlabel=postlabel)
         else:
             plt.gcf().canvas.mpl_connect(
                 'button_press_event',
@@ -746,7 +746,7 @@ def plot_all(mode=None, num=None, deg=DEG, priorlabel=None, postlabel=None):
 
 def onclick(event, mode=None, num=None, postlabel=None):
     """
-    Controls a sequence of events after a user having clicked a data point.
+    Control a sequence of events after a user having clicked a data point.
 
     Captures user-picked data and, if sufficient data points are available,
     inverts those, constructs an inversion-based AVA curve and computes the
@@ -804,11 +804,16 @@ def copy_data(mode=None, event=None):
 
     Parameters
     ----------
+    event : simplified MouseEvent
+        Coordinates of a list of fake pick events.
+
+    Globals
+    -------
     data : dict
         'amp' amplitude
         'deg' incidence angles
-    event : simplified MouseEvent
-        Coordinates of a list of fake pick events.
+    mode : char
+        Operational mode, here, either 'data' or 'data+'
 
     Returns
     -------
@@ -840,11 +845,16 @@ def catch_data(mode=None, event=None):
 
     Parameters
     ----------
+    mode : char
+        Operational mode, here, either 'data' or 'data+'
+    event : MouseEvent
+        Coordinates of a pick event.
+
+    Globals
+    -------
     data : dict
         'amp' amplitude
         'deg' incidence angles
-    event : MouseEvent
-        Coordinates of a pick event.
 
     Returns
     -------
@@ -977,13 +987,11 @@ def comp_post_ava(grad=DEG):
     ava['amp'] = gmat @ post['mod']
     if not np.all(np.isnan(post['std'])):
         ava['std'] = np.sqrt(np.dot(gmat2, post['std']**2))
-        ava['amp+std'] = ava['amp'] + ava['std']
-        ava['amp-std'] = ava['amp'] - ava['std']
 
 
 def plot_post_ava(mode=None, num=None, postlabel=None):
     """
-    Plot the AVA curve from the posterior model
+    Plot the AVA curve from the posterior model.
 
     Parameters
     ----------
@@ -1005,12 +1013,6 @@ def plot_post_ava(mode=None, num=None, postlabel=None):
     if 'AVA' in mode:
         fig[num].plt_line(
             x=DEG, y=ava['amp'], key='amp', opt=AVACOLOR, label=postlabel)
-        if 'AVA+' in mode:
-            if len(ava['amp+std']) > 0:
-                fig[num].plt_line(
-                    x=DEG, y=ava['amp+std'], key='amp+std', opt=AVACOLOR)
-                fig[num].plt_line(
-                    x=DEG, y=ava['amp-std'], key='amp-std', opt=AVACOLOR)
         if len(ava['amp'] == 3):   # do it after having inverted first time
             plt.legend()
 
@@ -1325,7 +1327,7 @@ def get_medium(text='', halfspace=None, **kwargs):
 
 def get_back(mode=None):
     """
-    Computes the background medium.
+    Compute the background medium.
 
     Input are the elastic parameters of top and bottom halfspace.
 
@@ -1367,7 +1369,7 @@ def get_back(mode=None):
 
 def get_precon(mode=None):
     """
-    Computes the prior contrast.
+    Compute the prior contrast.
 
     Input are the elastic parameters of top and bottom halfspace.
 
@@ -1409,7 +1411,7 @@ def get_precon(mode=None):
 
 def get_prior(mode=None):
     """
-    Computes the prior.
+    Compute the prior.
 
     Input are background and prior contrast.
 
@@ -1461,7 +1463,7 @@ def get_prior(mode=None):
 
 def get_poscon(mode=None):
     """
-    Computes the posterior contrast.
+    Compute the posterior contrast.
 
     Input are the background and posterior (from AVA inversion).
 
@@ -1618,7 +1620,7 @@ def do_avadata(mode=None, num=None, title=None, priorlabel=None):
     mode : char
         Operational mode
     num : int
-        Figure number.
+        Figure number
     title : char
         Figure title.
     priorlabel : char
@@ -1640,8 +1642,7 @@ def do_avadata(mode=None, num=None, title=None, priorlabel=None):
     # initialize figure
     init_plot(num=num, title=title)
     # plot prior AVA curve, catch data points, invert, plot posterior AVA curve
-    plot_all(
-        mode=mode, num=num, priorlabel=priorlabel, postlabel="posterior model")
+    plot_all(mode=mode, num=num, priorlabel=priorlabel)
     # exit figure
     plt.ion()
     exit_plot(env=ENVIRONMENT)
@@ -1660,9 +1661,9 @@ if __name__ == '__main__':
         title='Triangular Wavelet with Noise Contamination')
     # create an AVA curve from a prior model, catch interactively data points
     # and invert for a posterior model, re-create the corresponding AVA curve
-    #do_avadata(
-    #    mode='COEFF-DATA-AVA-', num=2, title='Classical AVA Analysis',
-    #    priorlabel='prior model')
+    do_avadata(
+        mode='COEFF-DATA-AVA-', num=2, title='Classical AVA Analysis',
+        priorlabel='prior model')
     do_avadata(
         mode='COEFF+DATA+AVA+', num=3, title='AVA Analysis under Uncertainty',
         priorlabel='prior model')

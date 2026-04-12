@@ -2,7 +2,7 @@
 
 ## Subsurface-Velocity Ambiguity
 
-Traveltime analysis over an anisotropic subsurface is inherently ambiguous. I can modify the subsurface and the exact or linearized velocity of a seismic wave travelling through that subsurface, in some specific way, yet the traveltimes observed at the surface show no or only "small" changes, respectively.  
+Traveltime analysis over an anisotropic subsurface is inherently ambiguous. I can modify the subsurface and the exact or linearized velocity of a seismic wave travelling through that subsurface, in some specific way, yet the traveltimes observed at the surface show no or only "small" changes, respectively.
 ![two different subsurface-wavefronts models](SubsurfaceModel.png?raw=true)
 - The paper ["Weakly-Anelliptical Traveltime Analysis: Ambiguity between Subsurface and Elasticity"](https://library.seg.org/doi/abs/10.1190/geo2023-0274.1) is published in Geophysics 89: C171-182. 
 - A [Python software called "ambiguity"](https://github.com/bjornrommel/steinkauz/blob/master/project/ambiguity/ambiguity.py) simulates the propagation of two waves, the original and a modified one, and displays their wavefronts (see above). 
