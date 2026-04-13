@@ -11,7 +11,7 @@ Python code for the "avo_for_density" Notebook.
 @version: 2.3.0
 @date: 12.08.2024
 @author: Björn E. Rommel
-@email: info@seisrock.com
+@email: steinkauz@seisrock.com
 
 """
 
