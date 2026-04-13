@@ -8,8 +8,8 @@ velocity, S-velocity, and density.
 
 Python code for the "avo_for_density" Notebook.
 
-@version: 2.3.0
-@date: 12.08.2024
+@version: 2.3.1
+@date: 13.04.2026
 @author: Björn E. Rommel
 @email: steinkauz@seisrock.com
 
@@ -36,14 +36,14 @@ DEG = [float(iii) / 100 for iii in range(0, 4001)]
 
 
 # default top properties
-VP1, DVP1 = 2180, 22000000
-VS1, DVS1 = 880, 9000000
-RHO1, DRHO1 = 2450, 25000000
+VP1, DVP1 = 2180, 220
+VS1, DVS1 = 880, 900
+RHO1, DRHO1 = 2450, 250
 
 # default bottom properties
-VP2, DVP2 = 2220, 22000000
-VS2, DVS2 = 920, 9000000
-RHO2, DRHO2 = 2550, 25000000
+VP2, DVP2 = 2220, 220
+VS2, DVS2 = 920, 900
+RHO2, DRHO2 = 2550, 250
 
 
 # default signal-to-noise ratio
@@ -183,7 +183,7 @@ if __name__ == '__main__':
     PRINT = True
     sys.tracebacklimit = 100   # default number of traceback levels
 else:                          # specifically for use with Jupyter
-    PRINT = True
+    PRINT = False
     sys.tracebacklimit = 10
 
 
@@ -564,8 +564,9 @@ def replot_data_ava(mode=None, num=None):
         if 'AVA+' in mode:
             for key in ['amp-std', 'amp+std']:
                 if len(ava[key]) > 0:
-                    fig[num].plt_line(
-                        x=DEG, y=ava[key], key=key, opt=AVACOLOR)
+                    pass
+                    # ### fig[num].plt_line(
+                    # ###    x=DEG, y=ava[key], key=key, opt=AVACOLOR)
     # exit figure
     exit_plot(env=ENVIRONMENT)
 
@@ -724,7 +725,8 @@ def plot_all(mode=None, num=None, deg=DEG, priorlabel=None, postlabel=None):
     if 'COEFF+' in mode:
         for key in ['amp+std', 'amp-std']:
             if len(coeff[key]) > 0:
-                plt.plot(deg, coeff[key], COEFFCOLOR)
+                pass
+                # ### plt.plot(deg, coeff[key], COEFFCOLOR)
     # plot legend
     plt.legend()
     # register clicks on data points
@@ -1112,7 +1114,8 @@ def get_para(vps=np.NAN):
     # print
     string = 'P-to-S velocity ratio:\n   vps = {:4.3f}\n'
     string = string.format(1. / para['vsp'])
-    print(string)
+    if PRINT:
+        print(string)
 
 
 # pylint:disable=invalid-name,too-many-arguments
